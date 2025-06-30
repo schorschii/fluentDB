@@ -58,6 +58,8 @@ return [
 	'objects_deleted' => 'Object(s) deleted',
 	'confirm_remove_categories' => 'Are you sure to delete the selected category/categories?',
 	'categories_deleted' => 'Category/categories deleted',
+	'no_elements_selected' => 'No Elements selected',
+	'unknown_method' => 'Unknown method',
 
 	// default category "general"
 	'title' => 'Title',

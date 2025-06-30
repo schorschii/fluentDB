@@ -53,6 +53,8 @@ return [
 	'objects_deleted' => 'Objekt(e) gelöscht',
 	'confirm_remove_categories' => 'Sind Sie sicher, dass Sie die gewählten Kategorie(n) löschen möchten?',
 	'categories_deleted' => 'Kategorie(n) gelöscht',
+	'no_elements_selected' => 'Keine Elemente ausgewählt',
+	'unknown_method' => 'Unbekannte Methode',
 
 	// default category "general"
 	'title' => 'Titel',

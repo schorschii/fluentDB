@@ -685,6 +685,10 @@ function saveCategory(objectId, container) {
 	);
 }
 function confirmDeleteCategorySet(ids) {
+	if(ids.length == 0) {
+		emitMessage(LANG['no_elements_selected'], '', MESSAGE_TYPE_WARNING);
+		return;
+	}
 	var params = [];
 	ids.forEach(function(entry) {
 		params.push({'key':'remove_category_set_id[]', 'value':entry});
@@ -698,6 +702,10 @@ function confirmDeleteCategorySet(ids) {
 	}
 }
 function confirmRemoveObjects(ids, infoText='') {
+	if(ids.length == 0) {
+		emitMessage(LANG['no_elements_selected'], '', MESSAGE_TYPE_WARNING);
+		return;
+	}
 	var params = [];
 	ids.forEach(function(entry) {
 		params.push({'key':'remove_id[]', 'value':entry});
