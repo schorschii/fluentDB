@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 30. Jun 2025 um 15:38
+-- Erstellungszeit: 30. Jun 2025 um 15:59
 -- Server-Version: 10.11.13-MariaDB-0ubuntu0.24.04.1
 -- PHP-Version: 8.3.6
 
@@ -54,7 +54,7 @@ CREATE TABLE `category_field` (
   `title` text NOT NULL,
   `type` text NOT NULL,
   `ro` tinyint(4) NOT NULL DEFAULT 0,
-  `order` int(11) NOT NULL
+  `order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -109,7 +109,7 @@ CREATE TABLE `list_view` (
 CREATE TABLE `list_view_field` (
   `list_view_id` int(11) NOT NULL,
   `category_field_id` int(11) NOT NULL,
-  `order` int(11) NOT NULL
+  `order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -216,7 +216,7 @@ CREATE TABLE `object_type_category` (
   `id` int(11) NOT NULL,
   `object_type_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
-  `order` int(11) NOT NULL
+  `order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -328,7 +328,8 @@ ALTER TABLE `list_view`
 -- Indizes für die Tabelle `list_view_field`
 --
 ALTER TABLE `list_view_field`
-  ADD PRIMARY KEY (`list_view_id`,`category_field_id`);
+  ADD PRIMARY KEY (`list_view_id`,`category_field_id`),
+  ADD KEY `fk__list_view_field__category_field` (`category_field_id`);
 
 --
 -- Indizes für die Tabelle `log`
@@ -516,6 +517,7 @@ ALTER TABLE `list_view`
 -- Constraints der Tabelle `list_view_field`
 --
 ALTER TABLE `list_view_field`
+  ADD CONSTRAINT `fk__list_view_field__category_field` FOREIGN KEY (`category_field_id`) REFERENCES `category_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk__list_view_field__list_view` FOREIGN KEY (`list_view_id`) REFERENCES `list_view` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
