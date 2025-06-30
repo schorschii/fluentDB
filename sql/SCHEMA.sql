@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 30. Jun 2025 um 15:18
+-- Erstellungszeit: 30. Jun 2025 um 15:33
 -- Server-Version: 10.11.13-MariaDB-0ubuntu0.24.04.1
 -- PHP-Version: 8.3.6
 
@@ -237,10 +237,17 @@ CREATE TABLE `object_type_group` (
 --
 
 CREATE TABLE `setting` (
-  `id` int(11) NOT NULL,
-  `key` text NOT NULL,
+  `key` varchar(100) NOT NULL,
   `value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `setting`
+--
+
+INSERT INTO `setting` (`key`, `value`) VALUES
+('api-enabled', '1'),
+('api-key', '123');
 
 -- --------------------------------------------------------
 
@@ -384,7 +391,7 @@ ALTER TABLE `object_type_group`
 -- Indizes für die Tabelle `setting`
 --
 ALTER TABLE `setting`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`key`);
 
 --
 -- Indizes für die Tabelle `system_user`
@@ -407,13 +414,13 @@ ALTER TABLE `system_user_role`
 -- AUTO_INCREMENT für Tabelle `category`
 --
 ALTER TABLE `category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
 -- AUTO_INCREMENT für Tabelle `category_field`
 --
 ALTER TABLE `category_field`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
 -- AUTO_INCREMENT für Tabelle `group`
@@ -467,12 +474,6 @@ ALTER TABLE `object_type_category`
 -- AUTO_INCREMENT für Tabelle `object_type_group`
 --
 ALTER TABLE `object_type_group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT für Tabelle `setting`
---
-ALTER TABLE `setting`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
