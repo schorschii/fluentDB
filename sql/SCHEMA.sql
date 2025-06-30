@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 30. Jun 2025 um 15:33
+-- Erstellungszeit: 30. Jun 2025 um 15:38
 -- Server-Version: 10.11.13-MariaDB-0ubuntu0.24.04.1
 -- PHP-Version: 8.3.6
 
@@ -285,6 +285,13 @@ CREATE TABLE `system_user_role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Daten für Tabelle `system_user_role`
+--
+
+INSERT INTO `system_user_role` (`id`, `name`, `permissions`) VALUES
+(1, 'Superadmin', '{\"Special\\\\Api\": true, \"Special\\\\WebFrontend\": true, \"Special\\\\GeneralConfiguration\": true}');
+
+--
 -- Indizes der exportierten Tabellen
 --
 
@@ -486,7 +493,7 @@ ALTER TABLE `system_user`
 -- AUTO_INCREMENT für Tabelle `system_user_role`
 --
 ALTER TABLE `system_user_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- Constraints der exportierten Tabellen
