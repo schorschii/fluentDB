@@ -28,7 +28,8 @@ class HouseKeeping {
 	}
 
 	private function logHouseKeeping() {
-		$result = $this->db->deleteLogEntryOlderThan(PURGE_LOGS_AFTER);
-		if($this->debug) echo('Purged '.intval($result).' log entries older than '.intval(PURGE_LOGS_AFTER).' seconds'."\n");
+		$purgeLogsAfter = $this->db->settings->get('purge-logs-after');
+		$result = $this->db->deleteLogEntryOlderThan($purgeLogsAfter);
+		if($this->debug) echo('Purged '.intval($result).' log entries older than '.intval($purgeLogsAfter).' seconds'."\n");
 	}
 }

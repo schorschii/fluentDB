@@ -1,14 +1,18 @@
 <?php
 require_once('../loader.inc.php');
 
-$info = null;
-$infoclass = null;
-
 // redirect to setup if setup is not done
 if(!$db->existsSchema() || !$db->isEstablished()) {
 	header('Location: setup.php');
 	die();
 }
+
+// init page objects/variables
+$license = new LicenseCheck($db);
+$loginScreenQuotes = json_decode($db->settings->get('login-screen-quotes'), true);
+
+$info = null;
+$infoclass = null;
 
 // execute login if requested
 require_once('session-options.inc.php');
@@ -97,7 +101,7 @@ if(!empty($_SESSION['fluentdb_user_id'])) {
 			<a href='https://github.com/schorschii/fluentdb' target='_blank'>
 				<img id='forkme' src='img/forkme.png'>
 			</a>
-			<div id='motd'><?php if(!empty(LOGIN_SCREEN_QUOTES)) echo LOGIN_SCREEN_QUOTES[ rand(0, sizeof(LOGIN_SCREEN_QUOTES)-1) ]; ?></div>
+			<div id='motd'><?php if(!empty($loginScreenQuotes)) echo $loginScreenQuotes[ rand(0, sizeof($loginScreenQuotes)-1) ]; ?></div>
 		</div>
 	</div>
 
