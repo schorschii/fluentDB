@@ -49,8 +49,10 @@ try {
 				if($counter == 0) {
 					echo "<td><input type='checkbox' name='object_id[]' value='".intval($ofv[0])."'></td>";
 				} else {
-					if($counter == 1 && empty($value)) $value = LANG('empty_placeholder');
-					echo "<td><a ".explorerLink('views/object.php?id='.intval($ofv[0])).">".nl2br(htmlspecialchars($value))."</td>";
+					if($counter == 1 && empty($value)) $value = htmlspecialchars(LANG('empty_placeholder'));
+					elseif(empty($value)) $value = '&nbsp;';
+					else $value = nl2br(htmlspecialchars($value));
+					echo "<td><a ".explorerLink('views/object.php?id='.intval($ofv[0])).">".$value."</td>";
 				}
 				$counter ++;
 			}

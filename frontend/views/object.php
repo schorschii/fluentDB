@@ -85,7 +85,7 @@ try {
 			</table>
 			</div>
 			<div>
-				<button class='save primary hidden' onclick='saveCategory(<?php echo $object->id; ?>, this.parentNode.parentNode)'><img src='img/tick.dyn.svg'>&nbsp;<?php echo LANG('save'); ?></button>
+				<button class='save primary hidden' onclick='saveCategory(<?php echo $object->id; ?>, this.parentNode.parentNode)'><img src='img/tick.white.svg'>&nbsp;<?php echo LANG('save'); ?></button>
 				<button class='cancel hidden' onclick='viewMode(this.parentNode.parentNode)'><img src='img/close.dyn.svg'>&nbsp;<?php echo LANG('cancel'); ?></button>
 				<!-- -->
 				<button class='edit' onclick='editMode(this.parentNode.parentNode)' <?php if(!$permissionWrite) echo 'disabled'; ?>><img src='img/edit.dyn.svg'>&nbsp;<?php echo LANG('edit'); ?></button>
