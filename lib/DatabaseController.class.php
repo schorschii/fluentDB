@@ -87,9 +87,10 @@ class DatabaseController {
 	// Object Operations
 	public function searchAllObject($search, $limit=null) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT ot.title AS "object_type_title", o.*, ocv.value,
+			'SELECT o.id, ot.title AS "object_type_title", ot.image AS "object_type_image", cf.title AS "category_field_title", ocv.value, ocv.category_field_id,
 			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
 			FROM `object_category_value` ocv
+			INNER JOIN category_field cf ON cf.id = ocv.category_field_id
 			INNER JOIN `object_category_set` ocs ON ocs.id = ocv.object_category_set_id
 			INNER JOIN `object` o ON o.id = ocs.object_id
 			INNER JOIN `object_type` ot ON ot.id = o.object_type_id
@@ -98,7 +99,7 @@ class DatabaseController {
 			.($limit==null ? '' : 'LIMIT '.intval($limit))
 		);
 		$this->stmt->execute([':search' => '%'.$search.'%']);
-		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj');
+		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SearchResult');
 	}
 	public function selectAllObjectTypeGroup() {
 		$this->stmt = $this->dbh->prepare(
@@ -488,6 +489,16 @@ class DatabaseController {
 			}
 		} catch(PDOException $ignored) {}
 		return null;
+	}
+	public function selectAllSetting() {
+		try {
+			$this->stmt = $this->dbh->prepare(
+				'SELECT * FROM setting ORDER BY `key`'
+			);
+			$this->stmt->execute();
+			return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Setting');
+		} catch(PDOException $ignored) {}
+		return [];
 	}
 	public function insertOrUpdateSettingByKey($key, $value) {
 		$this->stmt = $this->dbh->prepare(

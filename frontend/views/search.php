@@ -21,7 +21,7 @@ foreach($db->searchAllObject($_GET['query']) as $o) {
 	$counter ++;
 	#if(!$cl->checkPermission($o, PermissionManager::METHOD_READ, false)) continue; // TODO
 	if($counter > $maxResults) { $moreAvail = true; break; }
-	$items[] = new Models\SearchResult($o->title, LANG('computer'), 'views/object.php?id='.$o->id, '');
+	$items[] = $o;
 }
 
 // extension search
@@ -50,19 +50,19 @@ if(count($items) == 0) {
 		<table class='list searchable sortable savesort fullwidth'>
 			<thead>
 				<tr>
-					<th class='searchable sortable'><?php echo LANG('type'); ?></th>
-					<th class='searchable sortable'><?php echo LANG('name'); ?></th>
+					<th class='searchable sortable'><?php echo LANG('object_type'); ?></th>
+					<th class='searchable sortable'><?php echo LANG('title'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 			<?php foreach($items as $item) { ?>
 				<tr>
 					<td>
-						<img src='<?php echo htmlspecialchars($item->icon); ?>'>
-						<?php echo htmlspecialchars($item->type); ?>
+						<?php if($item->object_type_image) { ?><img src='<?php echo base64image($item->object_type_image); ?>'><?php } ?>
+						<?php echo htmlspecialchars($item->object_type_title); ?>
 					</td>
 					<td>
-						<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink($item->link); ?>><?php echo htmlspecialchars($item->text); ?></a>
+						<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink('views/object.php?id='.$item->id); ?>><?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?></a>
 					</td>
 				</tr>
 			<?php } ?>
@@ -89,7 +89,10 @@ if(count($items) == 0) {
 
 <?php foreach($items as $item) { ?>
 	<div class='node'>
-		<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink($item->link, 'closeSearchResults()'); ?>><img src='<?php echo htmlspecialchars($item->icon); ?>'><?php echo htmlspecialchars($item->text); ?></a>
+		<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink('views/object.php?id='.$item->id, 'closeSearchResults()'); ?>>
+			<?php if($item->object_type_image) { ?><img src='<?php echo base64image($item->object_type_image); ?>'><?php } ?>
+			<?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?>
+		</a>
 	</div>
 <?php } ?>
 <?php if($moreAvail) { ?>
