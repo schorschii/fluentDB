@@ -61,7 +61,7 @@ try {
 					<?php foreach($cs->id<0 ? $db->selectAllCategoryValueByCategory($c->id, $object->id) : $db->selectAllCategoryValueByCategorySet($cs->id, $object->id) as $cv) { ?>
 					<tr>
 						<th><?php echo htmlspecialchars(LANG($cv->title)); ?></th>
-						<td>
+						<td class='dualInput'>
 							<div class='<?php if($cv->ro) echo 'ro-label'; else echo 'label'; ?> <?php if($cv->type=='separator') echo 'separator'; ?>'><?php echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value)); ?></div>
 							<?php if(!$cv->ro) { ?>
 							<?php if($cv->type == 'text') { ?>
@@ -69,7 +69,9 @@ try {
 							<?php } elseif($cv->type == 'text-multiline') { ?>
 								<textarea name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>'><?php echo htmlspecialchars($cv->value); ?></textarea>
 							<?php } elseif($cv->type == 'datetime') { ?>
-								<input type='date' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+								<input type='hidden' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+								<input type='date' value='<?php echo htmlspecialchars(explode(' ',$cv->value)[0],ENT_QUOTES); ?>' oninput='this.parentElement.querySelectorAll("input[type=hidden]")[0].value = this.value+" "+this.parentElement.querySelectorAll("input[type=time]")[0].value' />
+								<input type='time' value='<?php echo htmlspecialchars(explode(' ',$cv->value)[1]??'',ENT_QUOTES); ?>' oninput='this.parentElement.querySelectorAll("input[type=hidden]")[0].value = this.parentElement.querySelectorAll("input[type=date]")[0].value+" "+this.value' />
 							<?php } elseif($cv->type == 'date') { ?>
 								<input type='date' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
 							<?php } elseif($cv->type == 'time') { ?>

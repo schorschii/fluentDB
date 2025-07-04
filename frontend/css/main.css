@@ -800,6 +800,7 @@ table.form th.top, table.form td.top {
 }
 .dualInput {
 	display: flex;
+	gap: 5px;
 }
 
 table.category input:not([type=checkbox]):not([type=radio]),

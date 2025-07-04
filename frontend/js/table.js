@@ -5,7 +5,7 @@ function initTables(root=document) {
 
 		// count total rows
 		let tbody = table.getElementsByTagName('tbody');
-		let counter = tbody[0].getElementsByTagName('tr').length;
+		let counter = tbody.length ? tbody[0].getElementsByTagName('tr').length : 0;
 		let counterNodes = table.querySelectorAll('tfoot span.counterTotal, tfoot span.counterFiltered');
 		if(counterNodes) for(var n = 0; n < counterNodes.length; n++) {
 			counterNodes[n].textContent = String(counter);
