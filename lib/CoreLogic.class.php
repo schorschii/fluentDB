@@ -18,6 +18,13 @@ class CoreLogic {
 	protected /*Models\SystemUser*/ $su;
 	protected /*PermissionManager*/ $pm;
 
+	const GENERAL_CATEGORY_ID = 1;
+	const TITLE_FIELD_ID = 1;
+	const CREATED_FIELD_ID = 9;
+	const CREATED_BY_FIELD_ID = 10;
+	const CHANGED_FIELD_ID = 11;
+	const CHANGED_BY_FIELD_ID = 12;
+
 	function __construct($db, $systemUser=null) {
 		$this->db = $db;
 		$this->su = $systemUser;
@@ -59,53 +66,57 @@ class CoreLogic {
 		$this->checkPermission($object, PermissionManager::METHOD_READ);
 		return $object;
 	}
-	public function createObject($title) {
-		$this->checkPermission(new Models\Computer(), PermissionManager::METHOD_CREATE);
+	public function createObject($typeId) {
+		#$this->checkPermission(new Models\Obj(), PermissionManager::METHOD_CREATE); // TODO
 
-		$finalTitle = trim($title);
-		if(empty($finalTitle)) {
-			throw new InvalidRequestException(LANG('title_cannot_be_empty'));
-		}
-		$insertId = $this->db->insertObject($finalTitle);
+		$insertId = $this->db->insertObject($typeId);
 		if(!$insertId) throw new Exception(LANG('unknown_error'));
-		$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $insertId, 'fluentdb.object.create', ['title'=>$finalTitle]);
+
+		$this->updateCategories($insertId, [
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CREATED_FIELD_ID, -1, date('Y-m-d H:i:s')),
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CREATED_BY_FIELD_ID, -1, $this->su->username),
+		]);
+
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $insertId, 'fluentdb.object.create', ['title'=>$finalTitle]);
 		return $insertId;
 	}
 	public function removeObject($id) {
 		$object = $this->db->selectObject($id);
 		if(empty($object)) throw new NotFoundException();
-		$this->checkPermission($object, PermissionManager::METHOD_DELETE);
+		#$this->checkPermission($object, PermissionManager::METHOD_DELETE);
 
-		$result = $this->db->deleteComputer($object->id);
+		$result = $this->db->deleteObject($object->id);
 		if(!$result) throw new Exception(LANG('unknown_error'));
-		$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $object->id, 'fluentdb.object.delete', json_encode($object));
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $object->id, 'fluentdb.object.delete', json_encode($object));
 		return $result;
 	}
 	public function updateCategories(int $objId, array $editFields, bool $recurse=false) {
 		$createdSets = [];
-		foreach($editFields as $value) {
-			// TODO transaction
+		if(!$recurse) $this->db->getDbHandle()->beginTransaction();
+		foreach($editFields as $field) {
 			// TODO permission check
 			// TODO logbook changes
-			$category = $this->db->selectCategory($value['category']);
-			$sets = $this->db->selectAllCategorySetByCategoryObject($value['category'], $objId);
+			$category = $this->db->selectCategory($field->category_id);
+			$sets = $this->db->selectAllCategorySetByCategoryObject($field->category_id, $objId);
 			if($category->multivalue == 0 && count($sets)) {
-				$this->db->replaceObjectCategoryValue($sets[0]->id, $value['field'], $value['value']);
+				$this->db->replaceObjectCategoryValue($sets[0]->id, $field->category_field_id, $field->value);
 			} else {
-				if($value['set'] < 0 && array_key_exists($value['category'], $createdSets)) {
-					$setId = $createdSets[$value['category']];
-				} elseif($value['set'] < 0 && !array_key_exists($value['category'], $createdSets)) {
-					$setId = $this->db->insertObjectCategorySet($objId, $value['category']);
-					$createdSets[$value['category']] = $setId;
+				if($field->category_set_id < 0 && array_key_exists($field->category_id, $createdSets)) {
+					$setId = $createdSets[$field->category_id];
+				} elseif($field->category_set_id < 0 && !array_key_exists($field->category_id, $createdSets)) {
+					$setId = $this->db->insertObjectCategorySet($objId, $field->category_id);
+					$createdSets[$field->category_id] = $setId;
 				} else {
-					$setId = $value['set'];
+					$setId = $field->category_set_id;
 				}
-				$this->db->replaceObjectCategoryValue($setId, $value['field'], $value['value']);
+				$this->db->replaceObjectCategoryValue($setId, $field->category_field_id, $field->value);
 			}
 		}
 		if(!$recurse) $this->updateCategories($objId, [
-			['category'=>1, 'field'=>11, 'value'=>date('Y-m-d H:i:s')]
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CHANGED_FIELD_ID, -1, date('Y-m-d H:i:s')),
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CHANGED_BY_FIELD_ID, -1, $this->su->username),
 		], true);
+		if(!$recurse) $this->db->getDbHandle()->commit();
 	}
 
 }

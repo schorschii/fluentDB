@@ -231,14 +231,14 @@ class DatabaseController {
 			'DELETE FROM `object` WHERE id = :id'
 		);
 		if(!$this->stmt->execute([':id' => $id])) return false;
-		return ($this->stmt->rowCount() != 1);
+		return $this->stmt->rowCount();
 	}
 	public function deleteCategorySet($id) {
 		$this->stmt = $this->dbh->prepare(
 			'DELETE FROM `object_category_set` WHERE id = :id'
 		);
 		if(!$this->stmt->execute([':id' => $id])) return false;
-		return ($this->stmt->rowCount() != 1);
+		return $this->stmt->rowCount();
 	}
 
 	public function insertObjectCategorySet($object_id, $category_id) {
