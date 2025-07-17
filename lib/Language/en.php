@@ -65,7 +65,6 @@ return [
 	'permission_denied' => 'Permission denied',
 	'settings' => 'Settings',
 	'configuration_overview' => 'Configuration Overview',
-	'system_user_placeholder' => 'System User »%«',
 	'system_user_management' => 'System User Management',
 	'license' => 'License',
 	'buy_license' => 'Buy license',

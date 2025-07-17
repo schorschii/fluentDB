@@ -60,7 +60,6 @@ return [
 	'permission_denied' => 'Zugriff verweigert',
 	'settings' => 'Einstellungen',
 	'configuration_overview' => 'Konfigurationsübersicht',
-	'system_user_placeholder' => 'Systembenutzer »%«',
 	'system_user_management' => 'Systembenutzerverwaltung',
 	'license' => 'Lizenz',
 	'buy_license' => 'Lizenz kaufen',

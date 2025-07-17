@@ -21,9 +21,14 @@ try {
 }
 ?>
 
-<h1><?php if($ot->image) { ?><img src='<?php echo base64image($ot->image); ?>'><?php } ?><span id='page-title'><?php echo htmlspecialchars($ot->title); ?></span></h1>
+<h1>
+	<?php if($ot->image) { ?><img src='<?php echo base64image($ot->image); ?>'><?php } ?>
+	<span id='page-title'><?php echo htmlspecialchars(LANG($ot->title)); ?></span>
+</h1>
 <div class='controls'>
-	<button onclick='createObject(<?php echo $ot->id; ?>)' <?php if(!$permissionCreate) echo 'disabled'; ?>><img src='img/add.dyn.svg'>&nbsp;<?php echo LANG('new'); ?></button>
+	<button onclick='createObject(<?php echo $ot->id; ?>)' <?php if(!$permissionCreate) echo 'disabled'; ?>>
+		<img src='img/add.dyn.svg'>&nbsp;<?php echo LANG('new'); ?>
+	</button>
 </div>
 
 <div class='details-abreast'>
