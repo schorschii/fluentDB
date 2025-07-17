@@ -444,7 +444,7 @@ ALTER TABLE `object_group`
 -- AUTO_INCREMENT für Tabelle `object_type`
 --
 ALTER TABLE `object_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
 -- AUTO_INCREMENT für Tabelle `object_type_category`
@@ -456,7 +456,7 @@ ALTER TABLE `object_type_category`
 -- AUTO_INCREMENT für Tabelle `object_type_group`
 --
 ALTER TABLE `object_type_group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
 -- Constraints der exportierten Tabellen
