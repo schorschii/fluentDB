@@ -103,11 +103,13 @@ return [
 	'changed_by' => 'Geändert von',
 	'description' => 'Beschreibung',
 
-	// default object type "Person"
+	// default object type "Person" + group "Master Data"
+	'master_data' => 'Stammdaten',
 	'person' => 'Person',
 	// default category "Login"
-	'login' => 'Anmeldename',
-	'password' => 'Passwort',
+	'login_disabled' => 'Login deaktiviert',
+	#'username' => 'Benutzername',
+	#'password' => 'Passwort',
+	'unique_identifier' => 'Eindeutiger Identifier',
 	'last_login' => 'Letztes Login',
-	'uid' => 'Eindeutiger Identifier',
 ];

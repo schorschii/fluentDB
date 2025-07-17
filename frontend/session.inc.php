@@ -9,7 +9,7 @@ if(!isset($_SESSION['fluentdb_user_id'])) {
 
 // check if user account still exists and is not locked
 if(!isset($db)) { header('Location: index.php'); die(); }
-$currentSystemUser = $db->selectSystemUser($_SESSION['fluentdb_user_id']);
+$currentSystemUser = $db->selectObject($_SESSION['fluentdb_user_id']);
 if(empty($currentSystemUser) || !empty($currentSystemUser->locked)) {
 	redirectToLogin(true);
 }

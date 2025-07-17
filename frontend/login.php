@@ -20,21 +20,22 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
 	try {
 		$authenticator = new AuthenticationController($db);
 		$user = $authenticator->login($_POST['username'], $_POST['password']);
-		if($user == null || !$user instanceof Models\SystemUser) throw new Exception(LANG('unknown_error'));
+		if($user == null) throw new Exception(LANG('unknown_error'));
 
 		$cl1 = new CoreLogic($db, $user);
-		if(!$cl1->checkPermission(null, PermissionManager::SPECIAL_PERMISSION_CLIENT_WEB_FRONTEND, false)) {
-			throw new AuthenticationException(LANG('web_interface_login_not_allowed'));
-		}
+		#if(!$cl1->checkPermission(null, PermissionManager::SPECIAL_PERMISSION_CLIENT_WEB_FRONTEND, false)) {
+		#	throw new AuthenticationException(LANG('web_interface_login_not_allowed'));
+		#}
 
 		// login successful
-		$db->insertLogEntry(Models\Log::LEVEL_INFO, $user->username, null, Models\Log::ACTION_CLIENT_WEB, ['authenticated'=>true]);
-		$_SESSION['fluentdb_username'] = $user->username;
+		$username = $db->selectAllValueByObjectCategoryField($user->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::USERNAME_FIELD_ID);
+		$db->insertLogEntry(Models\Log::LEVEL_INFO, $username, null, Models\Log::ACTION_CLIENT_WEB, ['authenticated'=>true]);
+		$_SESSION['fluentdb_username'] = $username;
 		$_SESSION['fluentdb_user_id'] = $user->id;
 
 		$redirect = 'index.php';
 		if(!empty($_SESSION['fluentdb_login_redirect'])) $redirect = $_SESSION['fluentdb_login_redirect'];
-		header('Location: '.$redirect); die('Welcome to the enchanting world of FluentDB!');
+		header('Location: '.$redirect); die('Welcome to the enchanting world of fluentDB!');
 	} catch(AuthenticationException $e) {
 		$db->insertLogEntry(Models\Log::LEVEL_WARNING, $_POST['username'], null, Models\Log::ACTION_CLIENT_WEB, ['authenticated'=>false]);
 

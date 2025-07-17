@@ -109,10 +109,12 @@ return [
 	'description' => 'Description',
 
 	// default object type "Person"
+	'master_data' => 'Master Data',
 	'person' => 'Person',
 	// default category "Login"
-	'login' => 'Login Name',
-	'password' => 'Password',
+	'logn_disabled' => 'Login disabled',
+	#'username' => 'Username',
+	#'password' => 'Password',
+	'unique_identifier' => 'Unique Identifier',
 	'last_login' => 'Last Login',
-	'uid' => 'Unique Identifier',
 ];

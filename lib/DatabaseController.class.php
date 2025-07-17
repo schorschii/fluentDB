@@ -62,12 +62,12 @@ class DatabaseController {
 		$this->stmt = $this->dbh->prepare('SHOW TABLES LIKE "object"');
 		$this->stmt->execute();
 		if($this->stmt->rowCount() != 1) return false;
-		$this->stmt = $this->dbh->prepare('SHOW TABLES LIKE "system_user"');
+		$this->stmt = $this->dbh->prepare('SHOW TABLES LIKE "category"');
 		$this->stmt->execute();
 		return ($this->stmt->rowCount() == 1);
 	}
 	public function isEstablished() {
-		$this->stmt = $this->dbh->prepare('SELECT * FROM system_user');
+		$this->stmt = $this->dbh->prepare('SELECT * FROM `object`');
 		$this->stmt->execute();
 		return ($this->stmt->rowCount() > 0);
 	}
@@ -94,12 +94,49 @@ class DatabaseController {
 			INNER JOIN `object_category_set` ocs ON ocs.id = ocv.object_category_set_id
 			INNER JOIN `object` o ON o.id = ocs.object_id
 			INNER JOIN `object_type` ot ON ot.id = o.object_type_id
-			WHERE `value` LIKE :search
+			WHERE ocv.`value` LIKE :search
 			GROUP BY o.id'
 			.($limit==null ? '' : 'LIMIT '.intval($limit))
 		);
 		$this->stmt->execute([':search' => '%'.$search.'%']);
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SearchResult');
+	}
+	public function selectAllObjectByCategoryFieldValue($category_id, $category_field_id, $value) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT o.id, ot.title AS "object_type_title", ot.image AS "object_type_image",
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
+			FROM `object_category_value` ocv
+			INNER JOIN category_field cf ON cf.id = ocv.category_field_id
+			INNER JOIN `object_category_set` ocs ON ocs.id = ocv.object_category_set_id
+			INNER JOIN `object` o ON o.id = ocs.object_id
+			INNER JOIN `object_type` ot ON ot.id = o.object_type_id
+			WHERE ocv.`value` LIKE :value AND ocs.category_id = :category_id AND ocv.category_field_id = :category_field_id
+			GROUP BY o.id'
+		);
+		$this->stmt->execute([':value' => $value, ':category_id' => $category_id, ':category_field_id' => $category_field_id]);
+		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SearchResult');
+	}
+	public function selectAllValueByObjectCategoryField($object_id, $category_id, $category_field_id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT ocv.`value`
+			FROM `object_category_value` ocv
+			INNER JOIN category_field cf ON cf.id = ocv.category_field_id
+			INNER JOIN `object_category_set` ocs ON ocs.id = ocv.object_category_set_id
+			WHERE ocs.object_id = :object_id AND ocs.category_id = :category_id AND ocv.category_field_id = :category_field_id
+			GROUP BY ocs.object_id'
+		);
+		$this->stmt->execute([':object_id' => $object_id, ':category_id' => $category_id, ':category_field_id' => $category_field_id]);
+		if($this->stmt->rowCount() == 0)
+			return null;
+		elseif($this->stmt->rowCount() == 1)
+			return $this->stmt->fetchAll(PDO::FETCH_ASSOC)[0]['value'];
+		else {
+			$array = [];
+			foreach($this->stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+				$array[] = $row['value'];
+			}
+			return $array;
+		}
 	}
 	public function selectAllObjectTypeGroup() {
 		$this->stmt = $this->dbh->prepare(
@@ -265,14 +302,14 @@ class DatabaseController {
 	}
 
 	// List View Operations
-	public function selectAllListViewFieldByObjectTypeSystemUser($object_type_id, $system_user_id) {
+	public function selectAllListViewFieldByObjectTypeSystemUser($object_type_id, $user_object_id) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT lvf.*, cf.category_id, cf.title FROM `list_view_field` lvf
 			INNER JOIN list_view lv ON lv.id = lvf.list_view_id
 			INNER JOIN category_field cf ON cf.id = lvf.category_field_id
-			WHERE lv.object_type_id = :object_type_id AND lv.system_user_id = :system_user_id'
+			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id = :user_object_id'
 		);
-		$this->stmt->execute(['system_user_id' => $system_user_id, 'object_type_id' => $object_type_id]);
+		$this->stmt->execute(['user_object_id' => $user_object_id, 'object_type_id' => $object_type_id]);
 		if($this->stmt->rowCount())
 			return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\ListViewField');
 
@@ -280,7 +317,7 @@ class DatabaseController {
 			'SELECT lvf.*, cf.category_id, cf.title FROM `list_view_field` lvf
 			INNER JOIN list_view lv ON lv.id = lvf.list_view_id
 			INNER JOIN category_field cf ON cf.id = lvf.category_field_id
-			WHERE lv.object_type_id = :object_type_id AND lv.system_user_id IS NULL'
+			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id IS NULL'
 		);
 		$this->stmt->execute(['object_type_id' => $object_type_id]);
 		if($this->stmt->rowCount())
@@ -300,142 +337,6 @@ class DatabaseController {
 		);
 		$this->stmt->execute($inParams[1]);
 		return $this->stmt->fetchAll(PDO::FETCH_NUM);
-	}
-
-	// System User Operations
-	public function selectAllSystemUserRole() {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT sur.*, (SELECT count(id) FROM system_user su WHERE su.system_user_role_id = sur.id) AS "system_user_count" FROM system_user_role sur ORDER BY name ASC'
-		);
-		$this->stmt->execute();
-		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUserRole');
-	}
-	public function selectSystemUserRole($id) {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT sur.*, (SELECT count(id) FROM system_user su WHERE su.system_user_role_id = sur.id) AS "system_user_count" FROM system_user_role sur
-			WHERE sur.id = :id'
-		);
-		$this->stmt->execute([':id' => $id]);
-		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUserRole') as $row) {
-			return $row;
-		}
-	}
-	public function insertSystemUserRole($name, $permissions) {
-		$this->stmt = $this->dbh->prepare(
-			'INSERT INTO system_user_role (name, permissions) VALUES (:name, :permissions)'
-		);
-		$this->stmt->execute([
-			':name' => $name,
-			':permissions' => $permissions,
-		]);
-		return $this->dbh->lastInsertId();
-	}
-	public function updateSystemUserRole($id, $name, $permissions) {
-		$this->stmt = $this->dbh->prepare(
-			'UPDATE system_user_role SET name = :name, permissions = :permissions WHERE id = :id'
-		);
-		return $this->stmt->execute([
-			':id' => $id,
-			':name' => $name,
-			':permissions' => $permissions,
-		]);
-	}
-	public function deleteSystemUserRole($id) {
-		$this->stmt = $this->dbh->prepare(
-			'DELETE FROM system_user_role WHERE id = :id'
-		);
-		return $this->stmt->execute([':id' => $id]);
-	}
-	public function selectAllSystemUser() {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT su.*, sur.name AS "system_user_role_name", sur.permissions AS "system_user_role_permissions"
-			FROM system_user su LEFT JOIN system_user_role sur ON su.system_user_role_id = sur.id
-			ORDER BY username ASC'
-		);
-		$this->stmt->execute();
-		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUser');
-	}
-	public function selectSystemUser($id) {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT su.*, sur.name AS "system_user_role_name", sur.permissions AS "system_user_role_permissions"
-			FROM system_user su LEFT JOIN system_user_role sur ON su.system_user_role_id = sur.id
-			WHERE su.id = :id'
-		);
-		$this->stmt->execute([':id' => $id]);
-		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUser') as $row) {
-			return $row;
-		}
-	}
-	public function selectSystemUserByUsername($username) {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT su.*, sur.name AS "system_user_role_name", sur.permissions AS "system_user_role_permissions"
-			FROM system_user su LEFT JOIN system_user_role sur ON su.system_user_role_id = sur.id
-			WHERE su.username = :username'
-		);
-		$this->stmt->execute([':username' => $username]);
-		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUser') as $row) {
-			return $row;
-		}
-	}
-	public function selectSystemUserByUid($uid) {
-		$this->stmt = $this->dbh->prepare(
-			'SELECT su.*, sur.name AS "system_user_role_name", sur.permissions AS "system_user_role_permissions"
-			FROM system_user su LEFT JOIN system_user_role sur ON su.system_user_role_id = sur.id
-			WHERE su.uid = :uid'
-		);
-		$this->stmt->execute([':uid' => $uid]);
-		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\SystemUser') as $row) {
-			return $row;
-		}
-	}
-	public function insertSystemUser($uid, $username, $display_name, $password, $ldap, $email, $phone, $mobile, $description, $locked, $system_user_role_id) {
-		$this->stmt = $this->dbh->prepare(
-			'INSERT INTO system_user (uid, username, display_name, password, ldap, email, phone, mobile, description, locked, system_user_role_id)
-			VALUES (:uid, :username, :display_name, :password, :ldap, :email, :phone, :mobile, :description, :locked, :system_user_role_id)'
-		);
-		$this->stmt->execute([
-			':uid' => $uid,
-			':username' => $username,
-			':display_name' => $display_name,
-			':password' => $password,
-			':ldap' => $ldap,
-			':email' => $email,
-			':phone' => $phone,
-			':mobile' => $mobile,
-			':description' => $description,
-			':locked' => $locked,
-			':system_user_role_id' => $system_user_role_id,
-		]);
-		return $this->dbh->lastInsertId();
-	}
-	public function updateSystemUser($id, $uid, $username, $display_name, $password, $ldap, $email, $phone, $mobile, $description, $locked, $system_user_role_id) {
-		$this->stmt = $this->dbh->prepare(
-			'UPDATE system_user SET uid = :uid, username = :username, display_name = :display_name, password = :password, ldap = :ldap, email = :email, phone = :phone, mobile = :mobile, description = :description, locked = :locked, system_user_role_id = :system_user_role_id WHERE id = :id'
-		);
-		return $this->stmt->execute([
-			':id' => $id,
-			':uid' => $uid,
-			':username' => $username,
-			':display_name' => $display_name,
-			':password' => $password,
-			':ldap' => $ldap,
-			':email' => $email,
-			':phone' => $phone,
-			':mobile' => $mobile,
-			':description' => $description,
-			':locked' => $locked,
-			':system_user_role_id' => $system_user_role_id,
-		]);
-	}
-	public function updateSystemUserLastLogin($id) {
-		$this->stmt = $this->dbh->prepare('UPDATE system_user SET last_login = CURRENT_TIMESTAMP WHERE id = :id');
-		return $this->stmt->execute([':id' => $id]);
-	}
-	public function deleteSystemUser($id) {
-		$this->stmt = $this->dbh->prepare(
-			'DELETE FROM system_user WHERE id = :id'
-		);
-		return $this->stmt->execute([':id' => $id]);
 	}
 
 	// Log Operations

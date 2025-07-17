@@ -39,7 +39,8 @@ CREATE TABLE `category` (
 --
 
 INSERT INTO `category` (`id`, `constant`, `title`, `multivalue`) VALUES
-(1, 'C__CATG__GLOBAL', 'Allgemein', 0);
+(1, 'C__CATG__GLOBAL', 'Allgemein', 0),
+(2, 'C__CATS__PERSON_LOGIN', 'Login', 0);
 
 -- --------------------------------------------------------
 
@@ -75,7 +76,12 @@ INSERT INTO `category_field` (`id`, `category_id`, `constant`, `title`, `type`, 
 (11, 1, 'changed', 'changed', 'datetime', 1, 10),
 (12, 1, 'changed_by', 'changed_by', 'text', 1, 11),
 (13, 1, 'general-sep3', '', 'separator', 0, 12),
-(14, 1, 'description', 'description', 'text-multiline', 0, 13);
+(14, 1, 'description', 'description', 'text-multiline', 0, 13),
+(15, 2, 'disabled_login', 'login_disabled', 'dialog', 0, 0),
+(16, 2, 'username', 'username', 'text', 0, 1),
+(17, 2, 'password', 'password', 'text', 1, 2),
+(18, 2, 'uid', 'unique_identifier', 'text', 1, 3),
+(19, 2, 'last_login', 'last_login', 'datetime', 1, 4);
 
 -- --------------------------------------------------------
 
@@ -97,7 +103,7 @@ CREATE TABLE `group` (
 CREATE TABLE `list_view` (
   `id` int(11) NOT NULL,
   `object_type_id` int(11) NOT NULL,
-  `system_user_id` int(11) DEFAULT NULL
+  `user_object_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -138,7 +144,7 @@ CREATE TABLE `log` (
 CREATE TABLE `logbook` (
   `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
   `username` text NOT NULL,
-  `system_user_id` int(11) DEFAULT NULL,
+  `user_object_id` int(11) DEFAULT NULL,
   `object_title` text NOT NULL,
   `object_id` int(11) NOT NULL,
   `method` varchar(100) NOT NULL,
@@ -196,6 +202,23 @@ CREATE TABLE `object_group` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `object_type_group`
+--
+
+CREATE TABLE `object_type_group` (
+  `id` int(11) NOT NULL,
+  `title` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `object_type_group`
+--
+
+INSERT INTO `object_type_group` (`id`, `title`) VALUES
+(1, 'master_data');
+
+-- --------------------------------------------------------
+--
 -- Tabellenstruktur für Tabelle `object_type`
 --
 
@@ -205,6 +228,13 @@ CREATE TABLE `object_type` (
   `title` text NOT NULL,
   `image` mediumblob DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `object_type`
+--
+
+INSERT INTO `object_type` (`id`, `object_type_group_id`, `title`, `image`) VALUES
+(1, 1, 'person', NULL);
 
 -- --------------------------------------------------------
 
@@ -219,16 +249,13 @@ CREATE TABLE `object_type_category` (
   `order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Tabellenstruktur für Tabelle `object_type_group`
+-- Daten für Tabelle `object_type_category`
 --
 
-CREATE TABLE `object_type_group` (
-  `id` int(11) NOT NULL,
-  `title` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `object_type_category` (`id`, `object_type_id`, `category_id`, `order`) VALUES
+(1, 1, 1, 0),
+(2, 1, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -247,49 +274,9 @@ CREATE TABLE `setting` (
 
 INSERT INTO `setting` (`key`, `value`) VALUES
 ('api-enabled', '1'),
-('api-key', '123');
+('api-key', '');
 
 -- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `system_user`
---
-
-CREATE TABLE `system_user` (
-  `id` int(11) NOT NULL,
-  `uid` text NOT NULL,
-  `username` text NOT NULL,
-  `display_name` text NOT NULL,
-  `password` text DEFAULT NULL,
-  `ldap` tinyint(4) NOT NULL DEFAULT 0,
-  `email` text DEFAULT NULL,
-  `phone` text DEFAULT NULL,
-  `mobile` text DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `locked` tinyint(4) NOT NULL DEFAULT 0,
-  `last_login` datetime DEFAULT NULL,
-  `created` datetime NOT NULL DEFAULT current_timestamp(),
-  `system_user_role_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `system_user_role`
---
-
-CREATE TABLE `system_user_role` (
-  `id` int(11) NOT NULL,
-  `name` text NOT NULL,
-  `permissions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Daten für Tabelle `system_user_role`
---
-
-INSERT INTO `system_user_role` (`id`, `name`, `permissions`) VALUES
-(1, 'Superadmin', '{\"Special\\\\Api\": true, \"Special\\\\WebFrontend\": true, \"Special\\\\GeneralConfiguration\": true}');
 
 --
 -- Indizes der exportierten Tabellen
@@ -322,7 +309,7 @@ ALTER TABLE `group`
 ALTER TABLE `list_view`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk__list_view__object_type` (`object_type_id`),
-  ADD KEY `fk__list_view__system_user` (`system_user_id`);
+  ADD KEY `fk__list_view__system_user` (`user_object_id`);
 
 --
 -- Indizes für die Tabelle `list_view_field`
@@ -343,7 +330,7 @@ ALTER TABLE `log`
 ALTER TABLE `logbook`
   ADD KEY `timestamp` (`timestamp`),
   ADD KEY `method` (`method`),
-  ADD KEY `system_user_id` (`system_user_id`),
+  ADD KEY `user_object_id` (`user_object_id`),
   ADD KEY `object_id` (`object_id`);
 
 --
@@ -400,19 +387,6 @@ ALTER TABLE `object_type_group`
 --
 ALTER TABLE `setting`
   ADD PRIMARY KEY (`key`);
-
---
--- Indizes für die Tabelle `system_user`
---
-ALTER TABLE `system_user`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_system_user_role_id` (`system_user_role_id`);
-
---
--- Indizes für die Tabelle `system_user_role`
---
-ALTER TABLE `system_user_role`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
@@ -485,18 +459,6 @@ ALTER TABLE `object_type_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `system_user`
---
-ALTER TABLE `system_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT für Tabelle `system_user_role`
---
-ALTER TABLE `system_user_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
-
---
 -- Constraints der exportierten Tabellen
 --
 
@@ -511,7 +473,7 @@ ALTER TABLE `category_field`
 --
 ALTER TABLE `list_view`
   ADD CONSTRAINT `fk__list_view__object_type` FOREIGN KEY (`object_type_id`) REFERENCES `object_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk__list_view__system_user` FOREIGN KEY (`system_user_id`) REFERENCES `system_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk__list_view__system_user` FOREIGN KEY (`user_object_id`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `list_view_field`
@@ -552,12 +514,6 @@ ALTER TABLE `object_type`
 ALTER TABLE `object_type_category`
   ADD CONSTRAINT `fk__object_type_category__category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk__object_type_category__object_type` FOREIGN KEY (`object_type_id`) REFERENCES `object_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints der Tabelle `system_user`
---
-ALTER TABLE `system_user`
-  ADD CONSTRAINT `fk_system_user_role_id` FOREIGN KEY (`system_user_role_id`) REFERENCES `system_user_role` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

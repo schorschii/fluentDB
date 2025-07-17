@@ -30,13 +30,14 @@ if(isset($_POST['username'])
 	} elseif($_POST['password'] !== $_POST['password2']) {
 		$info = LANG('passwords_do_not_match');
 		$infoclass = 'error';
-	} elseif($db->existsSchema() && count($db->selectAllSystemUser()) == 0) {
-		$db->insertSystemUser(
-			md5(rand()), $_POST['username'], $_POST['username'],
-			password_hash($_POST['password'], PASSWORD_DEFAULT),
-			0/*ldap flag*/, null, null, null, 'initial admin user', 0/*locked*/,
-			1/*default role: superadmin*/
-		);
+	} elseif($db->existsSchema() && count($db->selectAllObjectByObjectType(CoreLogic::OBJTYPE_PERSON_ID)) == 0) {
+		$objId = $db->insertObject(CoreLogic::OBJTYPE_PERSON_ID);
+		$setId = $db->insertObjectCategorySet($objId, CoreLogic::GENERAL_CATEGORY_ID);
+		$db->replaceObjectCategoryValue($setId, CoreLogic::TITLE_FIELD_ID, $_POST['username']);
+		$setId = $db->insertObjectCategorySet($objId, CoreLogic::LOGIN_CATEGORY_ID);
+		$db->replaceObjectCategoryValue($setId, CoreLogic::USERNAME_FIELD_ID, $_POST['username']);
+		$db->replaceObjectCategoryValue($setId, CoreLogic::PASSWORD_FIELD_ID, password_hash($_POST['password'], PASSWORD_DEFAULT));
+
 		header('Location: login.php');
 		die();
 	}

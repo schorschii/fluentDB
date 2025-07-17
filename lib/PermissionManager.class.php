@@ -14,7 +14,7 @@ class PermissionManager {
 	const METHOD_WRITE    = 'write';
 	const METHOD_DELETE   = 'delete';
 
-	const SPECIAL_PERMISSION_SYSTEM_USER_MANAGEMENT = 'Models\\SystemUser';
+	const SPECIAL_PERMISSION_SYSTEM_USER_MANAGEMENT = 'Special\\SystemUserManagement';
 	const SPECIAL_PERMISSION_GENERAL_CONFIGURATION  = 'Special\\GeneralConfiguration';
 	const SPECIAL_PERMISSION_VIEW_DELETED_OBJECTS   = 'Special\\DeletedObjects';
 	const SPECIAL_PERMISSION_CLIENT_API             = 'Special\\ClientApi';

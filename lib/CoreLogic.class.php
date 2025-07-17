@@ -15,7 +15,7 @@ class CoreLogic {
 	*/
 
 	protected /*DatabaseController*/ $db;
-	protected /*Models\SystemUser*/ $su;
+	protected /*Models\Obj*/ $su;
 	protected /*PermissionManager*/ $pm;
 
 	const GENERAL_CATEGORY_ID  = 1;
@@ -24,6 +24,14 @@ class CoreLogic {
 	const CREATED_BY_FIELD_ID  = 10;
 	const CHANGED_FIELD_ID     = 11;
 	const CHANGED_BY_FIELD_ID  = 12;
+
+	const OBJTYPE_PERSON_ID          = 1;
+	const LOGIN_CATEGORY_ID          = 2;
+	const DISABLED_LOGIN_FIELD_ID    = 15;
+	const USERNAME_FIELD_ID          = 16;
+	const PASSWORD_FIELD_ID          = 17;
+	const UNIQUE_IDENTIFIER_FIELD_ID = 18;
+	const LAST_LOGIN_FIELD_ID        = 19;
 
 	function __construct($db, $systemUser=null) {
 		$this->db = $db;
