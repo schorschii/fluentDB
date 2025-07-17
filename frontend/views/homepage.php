@@ -26,12 +26,8 @@ $license = new LicenseCheck($db);
 
 	<div class='box fullwidth margintop stats'>
 		<div class='bars'>
-			<div class=''>
-			</div>
 			<div class=' version'>
 				<?php echo LANG('version').' '.FluentDbServer::APP_VERSION.' '.FluentDbServer::APP_RELEASE; ?>
-			</div>
-			<div class=''>
 			</div>
 		</div>
 		<hr/>
@@ -42,6 +38,19 @@ $license = new LicenseCheck($db);
 		<hr/>
 		<div>
 			<div class='motd'><?php echo LANG($db->settings->get('motd')); ?></div>
+		</div>
+		<hr/>
+		<div>
+			<div>
+				<img src='img/itinventory.png' style='max-height:120px'>
+			</div>
+			<div>
+				<h3>itInventory - CMDB Scan-App</h3>
+				<div>
+					<a href='https://play.google.com/store/apps/details?id=systems.sieber.itinventory' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
+					<a href='https://apps.apple.com/de/app/itinventory-i-doit-scanner/id1442661035' target='_blank'><img src='img/appstore-badge.svg' style='max-height:50px'></a>
+				</div>
+			</div>
 		</div>
 	</div>
 
