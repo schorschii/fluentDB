@@ -88,7 +88,7 @@ if(!empty($_SESSION['fluentdb_user_id'])) {
 					<?php if($info !== null) { ?>
 						<div class='alert bold <?php echo $infoclass; ?>'><?php echo $info; ?></div>
 					<?php } ?>
-					<input id='txtUsername' type='text' name='username' placeholder='<?php echo LANG('username'); ?>'>
+					<input id='txtUsername' type='text' name='username' placeholder='<?php echo LANG('username'); ?>' autofocus='true'>
 					<input id='txtPassword' type='password' name='password' placeholder='<?php echo LANG('password'); ?>'>
 					<button id='btnLogin' class='primary'><?php echo LANG('log_in'); ?></button>
 				</form>
