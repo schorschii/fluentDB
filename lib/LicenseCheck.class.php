@@ -26,7 +26,7 @@ class LicenseCheck {
 		$this->currentObjectCount = $db->getStats()['objects'];
 		$this->licenseCompany = LANG('unregistered');
 		$this->licenseValid =
-			$this->checkLicense(json_decode($db->selectSettingByKey('license'), true))
+			$this->checkLicense(json_decode($db->settings->get('license'), true))
 			|| $this->checkFreeLicense();
 	}
 
