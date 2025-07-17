@@ -16,6 +16,7 @@ class CoreLogic {
 
 	protected /*DatabaseController*/ $db;
 	protected /*Models\Obj*/ $su;
+	protected /*string*/ $suUsername = '';
 	protected /*PermissionManager*/ $pm;
 
 	const GENERAL_CATEGORY_ID  = 1;
@@ -36,6 +37,8 @@ class CoreLogic {
 	function __construct($db, $systemUser=null) {
 		$this->db = $db;
 		$this->su = $systemUser;
+		if($systemUser)
+			$this->suUsername = $this->db->selectAllValueByObjectCategoryField($systemUser->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::USERNAME_FIELD_ID);
 	}
 
 	/*** Permission Check Logic ***/
@@ -82,10 +85,10 @@ class CoreLogic {
 
 		$this->updateCategories($insertId, [
 			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CREATED_FIELD_ID, -1, date('Y-m-d H:i:s')),
-			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CREATED_BY_FIELD_ID, -1, $this->su->username),
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CREATED_BY_FIELD_ID, -1, $this->suUsername),
 		]);
 
-		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $insertId, 'fluentdb.object.create', ['title'=>$finalTitle]);
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->suUsername, $insertId, 'fluentdb.object.create', ['title'=>$finalTitle]);
 		return $insertId;
 	}
 	public function removeObject($id) {
@@ -95,7 +98,7 @@ class CoreLogic {
 
 		$result = $this->db->deleteObject($object->id);
 		if(!$result) throw new Exception(LANG('unknown_error'));
-		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $object->id, 'fluentdb.object.delete', json_encode($object));
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->suUsername, $object->id, 'fluentdb.object.delete', json_encode($object));
 		return $result;
 	}
 	public function removeCategorySet($id) {
@@ -113,7 +116,7 @@ class CoreLogic {
 
 		$result = $this->db->deleteCategorySet($id);
 		if(!$result) throw new Exception(LANG('unknown_error'));
-		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $cs->id, 'fluentdb.category.delete', json_encode($cs));
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->suUsername, $cs->id, 'fluentdb.category.delete', json_encode($cs));
 		return $result;
 	}
 	public function updateCategories(int $objId, array $editFields, bool $recurse=false) {
@@ -140,7 +143,7 @@ class CoreLogic {
 		}
 		if(!$recurse) $this->updateCategories($objId, [
 			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CHANGED_FIELD_ID, -1, date('Y-m-d H:i:s')),
-			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CHANGED_BY_FIELD_ID, -1, $this->su->username),
+			new Models\UpdateField(self::GENERAL_CATEGORY_ID, self::CHANGED_BY_FIELD_ID, -1, $this->suUsername),
 		], true);
 		if(!$recurse) $this->db->getDbHandle()->commit();
 	}
