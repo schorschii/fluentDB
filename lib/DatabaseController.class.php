@@ -233,6 +233,15 @@ class DatabaseController {
 		if(!$this->stmt->execute([':id' => $id])) return false;
 		return $this->stmt->rowCount();
 	}
+	public function selectCategorySet($id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `object_category_set` WHERE id = :id'
+		);
+		$this->stmt->execute([':id' => $id]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\ObjCategorySet') as $row) {
+			return $row;
+		}
+	}
 	public function deleteCategorySet($id) {
 		$this->stmt = $this->dbh->prepare(
 			'DELETE FROM `object_category_set` WHERE id = :id'

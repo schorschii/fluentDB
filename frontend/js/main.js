@@ -669,7 +669,7 @@ function viewMode(container) {
 	container.querySelectorAll('button.save')[0].classList.add('hidden');
 	container.querySelectorAll('button.cancel')[0].classList.add('hidden');
 }
-function saveCategory(objectId, container) {
+function saveCategory(objectId, container, infoText='') {
 	let postdata = {'edit_id':objectId};
 	let fields = container.querySelectorAll('table.category input, table.category select, table.category textarea');
 	for(let i=0; i<fields.length; i++) {
@@ -679,12 +679,12 @@ function saveCategory(objectId, container) {
 		urlencodeObject(postdata),
 		null,
 		function(text) {
-			emitMessage(LANG['saved'], text.trim(), MESSAGE_TYPE_SUCCESS);
+			emitMessage(LANG['saved'], infoText, MESSAGE_TYPE_SUCCESS);
 			refreshContent();
 		}
 	);
 }
-function confirmDeleteCategorySet(ids) {
+function confirmDeleteCategorySet(ids, infoText='') {
 	if(ids.length == 0) {
 		emitMessage(LANG['no_elements_selected'], '', MESSAGE_TYPE_WARNING);
 		return;

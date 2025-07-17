@@ -6,7 +6,7 @@ require_once('../session.inc.php');
 function checkUpdate() {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, FluentDbServer::UPDATE_API_URL);
-	curl_setopt($ch, CURLOPT_USERAGENT, 'OCO-Server '.FluentDbServer::APP_VERSION.' '.FluentDbServer::APP_RELEASE);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'fluentDB Server '.FluentDbServer::APP_VERSION.' '.FluentDbServer::APP_RELEASE);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
 	curl_setopt($ch, CURLOPT_TIMEOUT, 2);

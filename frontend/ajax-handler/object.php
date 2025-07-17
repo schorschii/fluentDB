@@ -22,7 +22,7 @@ try {
 
 	if(!empty($_POST['remove_category_set_id']) && is_array($_POST['remove_category_set_id'])) {
 		foreach($_POST['remove_category_set_id'] as $id) {
-			$db->deleteCategorySet($id);
+			$cl->removeCategorySet($id);
 		}
 		die();
 	}

@@ -18,12 +18,12 @@ class CoreLogic {
 	protected /*Models\SystemUser*/ $su;
 	protected /*PermissionManager*/ $pm;
 
-	const GENERAL_CATEGORY_ID = 1;
-	const TITLE_FIELD_ID = 1;
-	const CREATED_FIELD_ID = 9;
-	const CREATED_BY_FIELD_ID = 10;
-	const CHANGED_FIELD_ID = 11;
-	const CHANGED_BY_FIELD_ID = 12;
+	const GENERAL_CATEGORY_ID  = 1;
+	const TITLE_FIELD_ID       = 1;
+	const CREATED_FIELD_ID     = 9;
+	const CREATED_BY_FIELD_ID  = 10;
+	const CHANGED_FIELD_ID     = 11;
+	const CHANGED_BY_FIELD_ID  = 12;
 
 	function __construct($db, $systemUser=null) {
 		$this->db = $db;
@@ -88,6 +88,24 @@ class CoreLogic {
 		$result = $this->db->deleteObject($object->id);
 		if(!$result) throw new Exception(LANG('unknown_error'));
 		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $object->id, 'fluentdb.object.delete', json_encode($object));
+		return $result;
+	}
+	public function removeCategorySet($id) {
+		$cs = $this->db->selectCategorySet($id);
+		if(empty($cs)) throw new NotFoundException();
+		$object = $this->db->selectObject($cs->object_id);
+		if(empty($object)) throw new NotFoundException();
+		$category = $this->db->selectCategory($cs->category_id);
+		if(empty($category)) throw new NotFoundException();
+		#$this->checkPermission($object, PermissionManager::METHOD_EDIT);
+		#$this->checkPermission($category, PermissionManager::METHOD_EDIT);
+
+		if($cs->category_id == self::GENERAL_CATEGORY_ID)
+			throw new Exception('Refused to delete the general category');
+
+		$result = $this->db->deleteCategorySet($id);
+		if(!$result) throw new Exception(LANG('unknown_error'));
+		#$this->db->insertLogEntry(Models\Log::LEVEL_INFO, $this->su->username, $cs->id, 'fluentdb.category.delete', json_encode($cs));
 		return $result;
 	}
 	public function updateCategories(int $objId, array $editFields, bool $recurse=false) {

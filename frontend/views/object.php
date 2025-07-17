@@ -36,7 +36,7 @@ try {
 <?php foreach($db->selectAllCategoryByObjectType($object->object_type_id) as $c) { ?>
 	<div class='details-abreast'>
 		<div>
-			<h2><?php echo htmlspecialchars(LANG($c->title)); ?></h2>
+			<h2 id='hCategory<?php echo $c->id; ?>'><?php echo htmlspecialchars(LANG($c->title)); ?></h2>
 		</div>
 		<div>
 			<?php if($c->multivalue) { ?>
@@ -62,7 +62,9 @@ try {
 					<tr>
 						<th><?php echo htmlspecialchars(LANG($cv->title)); ?></th>
 						<td class='dualInput'>
-							<div class='<?php if($cv->ro) echo 'ro-label'; else echo 'label'; ?> <?php if($cv->type=='separator') echo 'separator'; ?>'><?php echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value)); ?></div>
+							<div class='<?php if($cv->ro) echo 'ro-label'; else echo 'label'; ?> <?php if($cv->type=='separator') echo 'separator'; ?>'>
+								<?php echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value)); ?>
+							</div>
 							<?php if(!$cv->ro) { ?>
 							<?php if($cv->type == 'text') { ?>
 								<input type='text' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
@@ -87,11 +89,22 @@ try {
 			</table>
 			</div>
 			<div>
-				<button class='save primary hidden' onclick='saveCategory(<?php echo $object->id; ?>, this.parentNode.parentNode)'><img src='img/tick.white.svg'>&nbsp;<?php echo LANG('save'); ?></button>
-				<button class='cancel hidden' onclick='viewMode(this.parentNode.parentNode)'><img src='img/close.dyn.svg'>&nbsp;<?php echo LANG('cancel'); ?></button>
+				<button class='save primary hidden' onclick='saveCategory(<?php echo $object->id; ?>, this.parentNode.parentNode, hCategory<?php echo $c->id; ?>.innerText)'>
+					<img src='img/tick.white.svg'>&nbsp;<?php echo LANG('save'); ?>
+				</button>
+				<button class='cancel hidden' onclick='viewMode(this.parentNode.parentNode)'>
+					<img src='img/close.dyn.svg'>&nbsp;<?php echo LANG('cancel'); ?>
+				</button>
 				<!-- -->
-				<button class='edit' onclick='editMode(this.parentNode.parentNode)' <?php if(!$permissionWrite) echo 'disabled'; ?>><img src='img/edit.dyn.svg'>&nbsp;<?php echo LANG('edit'); ?></button>
-				<button class='clear' onclick='confirmDeleteCategorySet([<?php echo $cs->id; ?>])' <?php if(!$permissionDelete) echo 'disabled'; ?>><img src='img/delete.dyn.svg'>&nbsp;<?php echo LANG('delete'); ?></button>
+				<button class='edit' onclick='editMode(this.parentNode.parentNode)'
+					<?php if(!$permissionWrite) echo 'disabled'; ?>>
+					<img src='img/edit.dyn.svg'>&nbsp;<?php echo LANG('edit'); ?>
+				</button>
+				<button class='clear <?php if($c->id == CoreLogic::GENERAL_CATEGORY_ID || $cs->id <= 0) echo 'invisible'; ?>'
+					onclick='confirmDeleteCategorySet([<?php echo $cs->id; ?>], hCategory<?php echo $c->id; ?>.innerText)'
+					<?php if(!$permissionDelete) echo 'disabled'; ?>>
+					<img src='img/delete.dyn.svg'>&nbsp;<?php echo LANG('delete'); ?>
+				</button>
 			</div>
 		</div>
 	<?php } ?>
