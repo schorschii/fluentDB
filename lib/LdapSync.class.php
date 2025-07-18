@@ -51,7 +51,7 @@ class LdapSync {
 		// iterate over results array
 		$foundLdapUsers = [];
 		$counter = 1;
-		for($i=0; $i<$data["count"]; $i++) {
+		for($i=0; $i<$data['count']; $i++) {
 			#var_dump($data[$i]); die(); // debug
 
 			if(empty($data[$i][LDAP_ATTR_UID][0])) {
@@ -64,7 +64,7 @@ class LdapSync {
 
 			// parse LDAP values
 			$username = $data[$i][LDAP_ATTR_USERNAME][0];
-			$title    = "?";
+			$title    = '?';
 			if(isset($data[$i][LDAP_ATTR_TITLE][0]))
 				$title = $data[$i][LDAP_ATTR_TITLE][0];
 
@@ -100,8 +100,16 @@ class LdapSync {
 		ldap_close($ldapconn);
 
 		if($this->debug) echo "<=== Check For Deleted Users... ===>\n";
-		foreach($this->db->selectAllObjectByObjectType(CoreLogic::OBJTYPE_PERSON_ID) as $dbUser) {
-			$dbUserUid = $this->db->selectAllValueByObjectCategoryField($dbUser->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::UNIQUE_IDENTIFIER_FIELD_ID);
+		$ids = [];
+		foreach($this->db->selectAllObjectByObjectType(CoreLogic::OBJTYPE_PERSON_ID) as $object)
+			$ids[] = $object->id;
+		$fields = [
+			Models\ListViewField::initWithValues(CoreLogic::UNIQUE_IDENTIFIER_FIELD_ID, CoreLogic::LOGIN_CATEGORY_ID, null),
+			Models\ListViewField::initWithValues(CoreLogic::USERNAME_FIELD_ID, CoreLogic::LOGIN_CATEGORY_ID, null),
+		];
+		foreach($this->db->selectAllCategoryFieldValueByObject($ids, $fields) as $dbUser) {
+			$dbUserUid = $dbUser[1];
+			$dbUserUsername = $dbUser[2];
 			if(empty($dbUserUid)) continue; // it's not an LDAP user
 
 			$found = false;
@@ -109,13 +117,12 @@ class LdapSync {
 				if($dbUserUid == $uid) {
 					$found = true; break;
 				}
-				$dbUserUsername = $this->db->selectAllValueByObjectCategoryField($dbUser->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::USERNAME_FIELD_ID);
 				if($dbUserUsername == $username) { // fallback for old DB schema without uid
 					$found = true; break;
 				}
 			}
 			if(!$found) {
-				if($this->db->deleteObject($dbUser->id)) {
+				if($this->db->deleteObject($dbUser[0])) {
 					if($this->debug) echo '--> '.$dbUserUsername.': deleting  OK'."\n";
 				}
 				else throw new Exception('Error deleting '.$dbUserUsername.': '.$this->db->getLastStatement()->error);
