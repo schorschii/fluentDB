@@ -20,7 +20,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
 	try {
 		$authenticator = new AuthenticationController($db);
 		$user = $authenticator->login($_POST['username'], $_POST['password']);
-		if($user == null) throw new Exception(LANG('unknown_error'));
+		if(!$user) throw new Exception(LANG('unknown_error'));
 
 		$cl1 = new CoreLogic($db, $user);
 		#if(!$cl1->checkPermission(null, PermissionManager::SPECIAL_PERMISSION_CLIENT_WEB_FRONTEND, false)) {

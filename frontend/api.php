@@ -1,5 +1,5 @@
 <?php
-require_once('../loader.inc.php');
+require_once(__DIR__.'/../loader.inc.php');
 
 // check API enabled
 if(!$db->settings->get('api-enabled')) {
@@ -63,7 +63,7 @@ try {
 		}
 		$authenticator = new AuthenticationController($db);
 		$user = $authenticator->login($username, $password);
-		if($user == null || !$user instanceof Models\SystemUser) {
+		if(!$user) {
 			throw new AuthenticationException(LANG('unknown_error'));
 		}
 
@@ -150,7 +150,7 @@ function handleJsonRequest($request) {
 				foreach($db->selectAllObjectTypeByObjectTypeGroup(null) as $ot) {
 					$objectTypes[] = [
 						'id' => strval($ot->id),
-						'title' => $ot->title,
+						'title' => LANG($ot->title),
 						'container' => 0,
 						'color' => '000000',
 						'image' => base64_encode($ot->image),
@@ -277,7 +277,25 @@ function handleJsonRequest($request) {
 						'objID' => $params['objID'],
 					];
 					foreach($db->selectAllCategoryValueByCategorySet($cs->id) as $v) {
-						$value[$v->constant] = $v->value;
+						$fieldInfo = $db->selectCategoryField($v->category_field_id);
+						if(!$fieldInfo) throw new NotFoundException();
+						if($fieldInfo->type == 'dialog')
+							$value[$v->constant] = [
+								'id' => $v->linked_dialog_value_id,
+								'title' => $v->linked_dialog_value_title,
+								'const' => null,
+							];
+						elseif(substr($fieldInfo->type,0,6) == 'object')
+							$value[$v->constant] = [
+								'id' => $v->linked_object_id,
+								'title' => $v->linked_object_title,
+								'sysid' => null,
+								'type' => null,
+								'type_title' => null,
+								'location_path' => null,
+							];
+						else
+							$value[$v->constant] = $v->value;
 					}
 					$values[] = $value;
 				}
@@ -296,12 +314,7 @@ function handleJsonRequest($request) {
 					$field = $db->selectCategoryFieldByCategoryConstant($category->id, $key);
 					if(!$field)
 						throw new NotFoundException();
-					$updates[] = [
-						'category' => $category->id,
-						'set' => $data['category_id'] ?? -1,
-						'field' => $field->id,
-						'value' => $value,
-					];
+					$updates[] = new Models\UpdateField($category->id, $field->id, $data['category_id'] ?? -1, $value);
 				}
 				$cl->updateCategories(intval($params['objID']), $updates);
 				$response['result'] = [
@@ -315,33 +328,54 @@ function handleJsonRequest($request) {
 				];
 				break;
 
-			case 'cmdb.objects.read': // TODO
+			case 'cmdb.object.archive': // TODO
 				$response['result'] = [
 					'success' => true, 'data' => []
 				];
 				break;
 
-			case 'cmdb.dialog.read': // TODO
-				$response['result'] = [
-					'success' => true, 'data' => [ 'id' => $insertId ]
-				];
+			case 'cmdb.objects.read':
+				if(!empty($params['filter']['type']))
+					$objects = $db->selectAllObjectByObjectType($params['filter']['type']);
+				$results = [];
+				foreach($objects as $object) {
+					$results[] = [
+						'id' => $object->id,
+						'title' => $object->title,
+						'sysid' => null,
+						'type' => null,
+						'created' => null,
+						'updated' => null,
+						'type_title' => null,
+						'type_group_title' => null,
+						'status' => 2,
+						'cmdb_status' => null,
+						'cmdb_status_title' => null,
+						'image' => null,
+					];
+				}
+				$response['result'] = $results;
+				break;
+
+			case 'cmdb.dialog.read':
+				$values = [];
+				$c = $db->selectCategoryByConstant($params['category']);
+				if(!$c) throw new NotFoundException();
+				$cf = $db->selectCategoryFieldByCategoryConstant($c->id, $params['property']);
+				if(!$cf) throw new NotFoundException();
+				foreach($db->selectAllDialogValueByCategoryField($cf->id) as $value) {
+					$values[] = ['id'=>$value->id, 'const'=>'', 'title'=>LANG($value->title)];
+				}
+				$response['result'] = $values;
 				break;
 
 			case 'cmdb.reports.read': // TODO
 				$response['result'] = [
-					'success' => true, 'data' => []
 				];
 				break;
 
 			case 'cmdb.objects_by_relation': // TODO
 				$response['result'] = [
-					'success' => true, 'data' => []
-				];
-				break;
-
-			case 'cmdb.object.archive': // TODO
-				$response['result'] = [
-					'success' => true, 'data' => []
 				];
 				break;
 
