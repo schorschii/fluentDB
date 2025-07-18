@@ -94,6 +94,8 @@ return [
 	'category' => 'Kategorie',
 	'purpose' => 'Einsatzzweck',
 	'cmdb_status' => 'CMDB-Status',
+	'in_operation' => 'In Betrieb',
+	'inoperative' => 'Außer Betrieb',
 	'tag' => 'Tags',
 	'sysid' => 'SYS-ID',
 	'created' => 'Erstellt',

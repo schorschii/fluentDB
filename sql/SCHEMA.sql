@@ -86,6 +86,26 @@ INSERT INTO `category_field` (`id`, `category_id`, `constant`, `title`, `type`, 
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `dialog_value`
+--
+
+CREATE TABLE `dialog_value` (
+  `id` int(11) NOT NULL,
+  `category_field_id` int(11) NOT NULL,
+  `title` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `dialog_value`
+--
+
+INSERT INTO `dialog_value` (`id`, `category_field_id`, `title`) VALUES
+(1, 5, 'in_operation'),
+(2, 5, 'inoperative');
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `group`
 --
 
@@ -185,7 +205,9 @@ CREATE TABLE `object_category_set` (
 CREATE TABLE `object_category_value` (
   `object_category_set_id` int(11) NOT NULL,
   `category_field_id` int(11) NOT NULL,
-  `value` text NOT NULL
+  `value` text NOT NULL,
+  `linked_object_id` INT NULL DEFAULT NULL,
+  `linked_dialog_value_id` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -469,6 +491,12 @@ ALTER TABLE `category_field`
   ADD CONSTRAINT `fk__category_field__category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints der Tabelle `dialog_value`
+--
+ALTER TABLE `dialog_value`
+  ADD CONSTRAINT `fk__dialog_value__category_field` FOREIGN KEY (`category_field_id`) REFERENCES `category_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints der Tabelle `list_view`
 --
 ALTER TABLE `list_view`
@@ -500,6 +528,8 @@ ALTER TABLE `object_category_set`
 --
 ALTER TABLE `object_category_value`
   ADD CONSTRAINT `fk__object_category_value__category_field` FOREIGN KEY (`category_field_id`) REFERENCES `category_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk__object_category_value__dialog_value` FOREIGN KEY (`linked_dialog_value_id`) REFERENCES `dialog_value` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk__object_category_value__object` FOREIGN KEY (`linked_object_id`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk__object_category_value__object_category_set` FOREIGN KEY (`object_category_set_id`) REFERENCES `object_category_set` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --

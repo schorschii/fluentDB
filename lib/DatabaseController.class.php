@@ -167,14 +167,18 @@ class DatabaseController {
 	}
 	public function selectAllObjectByObjectType($object_type_id) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT * FROM `object` WHERE object_type_id = :object_type_id'
+			'SELECT o.*,
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
+			FROM `object` o WHERE object_type_id = :object_type_id'
 		);
 		$this->stmt->execute(['object_type_id' => $object_type_id]);
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj');
 	}
 	public function selectObject($id) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT * FROM `object` WHERE id = :id'
+			'SELECT o.*,
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
+			FROM `object` o WHERE id = :id'
 		);
 		$this->stmt->execute([':id' => $id]);
 		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
@@ -199,6 +203,15 @@ class DatabaseController {
 			return $row;
 		}
 	}
+	public function selectCategoryField($id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `category_field` WHERE id = :id'
+		);
+		$this->stmt->execute([':id' => $id]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
+			return $row;
+		}
+	}
 	public function selectCategoryFieldByCategoryConstant($category_id, $constant) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT * FROM `category_field` WHERE category_id = :category_id AND constant = :constant'
@@ -207,6 +220,22 @@ class DatabaseController {
 		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
 			return $row;
 		}
+	}
+	public function selectDialogValue($id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `dialog_value` WHERE id = :id ORDER BY title'
+		);
+		$this->stmt->execute([':id' => $id]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\DialogValue') as $row) {
+			return $row;
+		}
+	}
+	public function selectAllDialogValueByCategoryField($id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `dialog_value` WHERE category_field_id = :category_field_id'
+		);
+		$this->stmt->execute([':category_field_id' => $id]);
+		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\DialogValue');
 	}
 	public function selectAllCategoryByObjectType($object_type_id) {
 		$this->stmt = $this->dbh->prepare(
@@ -236,9 +265,13 @@ class DatabaseController {
 	}
 	public function selectAllCategoryValueByCategorySet($object_category_set_id) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT cf.category_id, cf.id AS "category_field_id", cf.constant, cf.title, cf.type, cf.ro, ocv.value
+			'SELECT cf.category_id, cf.id AS "category_field_id", cf.constant, cf.title, cf.type, cf.ro,
+			ocv.value, ocv.linked_object_id, ocv.linked_dialog_value_id, ocv_dv.title AS "linked_dialog_value_title",
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o_l.id AND ocv2.category_field_id = 1 LIMIT 1) AS "linked_object_title"
 			FROM `category_field` cf
 			LEFT JOIN object_category_value ocv ON cf.id = ocv.category_field_id AND ocv.object_category_set_id = :object_category_set_id
+			LEFT JOIN dialog_value ocv_dv ON ocv_dv.id = ocv.linked_dialog_value_id
+			LEFT JOIN `object` o_l ON o_l.id = ocv.linked_object_id
 			WHERE cf.category_id = (SELECT category_id FROM object_category_set WHERE id = :object_category_set_id)
 			AND (ocv.object_category_set_id = :object_category_set_id OR ocv.object_category_set_id IS NULL)
 			ORDER BY cf.order'
@@ -248,7 +281,8 @@ class DatabaseController {
 	}
 	public function selectAllCategoryValueByCategory($category_id) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT cf.category_id, cf.id AS "category_field_id", cf.constant, cf.title, cf.type, cf.ro, "" AS "value"
+			'SELECT cf.category_id, cf.id AS "category_field_id", cf.constant, cf.title, cf.type, cf.ro,
+			"" AS "value", "" AS "linked_object_id", "" AS "linked_dialog_value_id", "" AS "linked_object_title", "" AS "linked_dialog_value_title"
 			FROM `category_field` cf
 			WHERE cf.category_id = :category_id
 			ORDER BY cf.order'
@@ -294,11 +328,26 @@ class DatabaseController {
 		$this->stmt->execute([':object_id' => $object_id, ':category_id' => $category_id]);
 		return $this->dbh->lastInsertId();
 	}
-	public function replaceObjectCategoryValue($object_category_set_id, $category_field_id, $value) {
+	public function replaceObjectCategoryValue($object_category_set_id, $category_field_id, $plainValue) {
+		$value = null;
+		$linked_object_id = null;
+		$linked_dialog_value_id = null;
+		$fieldInfo = $this->selectCategoryField($category_field_id);
+		if(!$fieldInfo) throw new NotFoundException();
+		if($fieldInfo->type == 'dialog')
+			$linked_dialog_value_id = intval($plainValue);
+		elseif(substr($fieldInfo->type,0,6) == 'object')
+			$linked_object_id = intval($plainValue);
+		else
+			$value = $plainValue;
 		$this->stmt = $this->dbh->prepare(
-			'REPLACE INTO `object_category_value` (object_category_set_id, category_field_id, `value`) VALUES (:object_category_set_id, :category_field_id, :value)'
+			'REPLACE INTO `object_category_value` (object_category_set_id, category_field_id, `value`, linked_object_id, linked_dialog_value_id)
+			VALUES (:object_category_set_id, :category_field_id, :value, :linked_object_id, :linked_dialog_value_id)'
 		);
-		return $this->stmt->execute([':object_category_set_id' => $object_category_set_id, ':category_field_id' => $category_field_id, ':value' => $value]);
+		return $this->stmt->execute([
+			':object_category_set_id' => $object_category_set_id, ':category_field_id' => $category_field_id,
+			':value' => $value, ':linked_object_id' => $linked_object_id, ':linked_dialog_value_id' => $linked_dialog_value_id,
+		]);
 	}
 
 	// List View Operations

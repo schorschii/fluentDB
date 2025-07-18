@@ -63,25 +63,67 @@ try {
 						<th><?php echo htmlspecialchars(LANG($cv->title)); ?></th>
 						<td class='dualInput'>
 							<div class='<?php if($cv->ro) echo 'ro-label'; else echo 'label'; ?> <?php if($cv->type=='separator') echo 'separator'; ?>'>
-								<?php echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value)); ?>
+								<?php
+								$selectedValue = null;
+								if($cv->type == 'dialog' || $cv->type == 'dialog_plus' || $cv->type == 'multiselect') {
+									if(empty($cv->linked_dialog_value_title)) echo '&nbsp;';
+									else {
+										$selectedValue = $cv->linked_dialog_value_id;
+										echo htmlspecialchars($cv->linked_dialog_value_title);
+									}
+								} elseif(explode(':',$cv->type)[0] == 'object') {
+									if(empty($cv->linked_object_title)) echo '&nbsp;';
+									else {
+										$selectedValue = $cv->linked_object_id;
+										echo '<a '.explorerLink('views/object.php?id='.intval($cv->linked_object_id)).'>'.htmlspecialchars($cv->linked_object_title).'</a>';
+									}
+								} else {
+									echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value));
+								} ?>
 							</div>
 							<?php if(!$cv->ro) { ?>
-							<?php if($cv->type == 'text') { ?>
-								<input type='text' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
-							<?php } elseif($cv->type == 'text-multiline') { ?>
-								<textarea name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>'><?php echo htmlspecialchars($cv->value); ?></textarea>
-							<?php } elseif($cv->type == 'datetime') { ?>
-								<input type='hidden' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+
+							<?php
+							$inputName = $cv->category_id.':'.$cs->id.':'.$cv->category_field_id;
+							if($cv->type == 'text') {
+							?>
+								<input type='text' name='<?php echo $inputName; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+							<?php
+							} elseif($cv->type == 'text-multiline') {
+							?>
+								<textarea name='<?php echo $inputName; ?>'><?php echo htmlspecialchars($cv->value); ?></textarea>
+							<?php
+							} elseif($cv->type == 'datetime') {
+							?>
+								<input type='hidden' name='<?php echo $inputName; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
 								<input type='date' value='<?php echo htmlspecialchars(explode(' ',$cv->value)[0],ENT_QUOTES); ?>' oninput='this.parentElement.querySelectorAll("input[type=hidden]")[0].value = this.value+" "+this.parentElement.querySelectorAll("input[type=time]")[0].value' />
 								<input type='time' value='<?php echo htmlspecialchars(explode(' ',$cv->value)[1]??'',ENT_QUOTES); ?>' oninput='this.parentElement.querySelectorAll("input[type=hidden]")[0].value = this.parentElement.querySelectorAll("input[type=date]")[0].value+" "+this.value' />
-							<?php } elseif($cv->type == 'date') { ?>
-								<input type='date' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
-							<?php } elseif($cv->type == 'time') { ?>
-								<input type='time' name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
-							<?php } elseif($cv->type == 'dialog' || $cv->type == 'dialog_plus' || $cv->type == 'multiselect') { ?>
-								<select name='<?php echo $cv->category_id.':'.$cs->id.':'.$cv->category_field_id; ?>'>
+							<?php
+							} elseif($cv->type == 'date') {
+							?>
+								<input type='date' name='<?php echo $inputName; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+							<?php
+							} elseif($cv->type == 'time') {
+							?>
+								<input type='time' name='<?php echo $inputName; ?>' value='<?php echo htmlspecialchars($cv->value,ENT_QUOTES); ?>' />
+							<?php
+							} elseif($cv->type == 'dialog' || $cv->type == 'dialog_plus' || $cv->type == 'multiselect') {
+							?>
+								<select name='<?php echo $inputName; ?>'>
+									<?php foreach($db->selectAllDialogValueByCategoryField($cv->category_field_id) as $value) { ?>
+										<option value='<?php echo htmlspecialchars($value->id); ?>' <?php if($selectedValue==$value->id) echo'selected'; ?>><?php echo htmlspecialchars($value->title); ?></option>
+									<?php } ?>
+								</select>
+							<?php
+							} elseif(explode(':',$cv->type)[0] == 'object') {
+							?>
+								<select name='<?php echo $inputName; ?>'>
+									<?php foreach($db->selectAllObjectByObjectType(explode(':',$cv->type)[1]??-1) as $o) { ?>
+										<option value='<?php echo htmlspecialchars($o->id); ?>' <?php if($selectedValue==$o->id) echo'selected'; ?>><?php echo htmlspecialchars($o->title); ?></option>
+									<?php } ?>
 								</select>
 							<?php } ?>
+
 							<?php } ?>
 						</td>
 					</tr>

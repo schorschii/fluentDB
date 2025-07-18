@@ -99,6 +99,8 @@ return [
 	'category' => 'Category',
 	'purpose' => 'Purpose',
 	'cmdb_status' => 'CMDB Status',
+	'in_operation' => 'In Operation',
+	'inoperative' => 'Inoperative',
 	'tag' => 'Tags',
 	'sysid' => 'SYS-ID',
 	'created' => 'Created',
