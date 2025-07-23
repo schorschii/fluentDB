@@ -69,7 +69,7 @@ try {
 									if(empty($cv->linked_dialog_value_title)) echo '&nbsp;';
 									else {
 										$selectedValue = $cv->linked_dialog_value_id;
-										echo htmlspecialchars($cv->linked_dialog_value_title);
+										echo htmlspecialchars(LANG($cv->linked_dialog_value_title));
 									}
 								} elseif(explode(':',$cv->type)[0] == 'object') {
 									if(empty($cv->linked_object_title)) echo '&nbsp;';
@@ -111,7 +111,7 @@ try {
 							?>
 								<select name='<?php echo $inputName; ?>'>
 									<?php foreach($db->selectAllDialogValueByCategoryField($cv->category_field_id) as $value) { ?>
-										<option value='<?php echo htmlspecialchars($value->id); ?>' <?php if($selectedValue==$value->id) echo'selected'; ?>><?php echo htmlspecialchars($value->title); ?></option>
+										<option value='<?php echo $value->id; ?>' <?php if($selectedValue==$value->id) echo'selected'; ?>><?php echo htmlspecialchars(LANG($value->title)); ?></option>
 									<?php } ?>
 								</select>
 							<?php
@@ -119,7 +119,7 @@ try {
 							?>
 								<select name='<?php echo $inputName; ?>'>
 									<?php foreach($db->selectAllObjectByObjectType(explode(':',$cv->type)[1]??-1) as $o) { ?>
-										<option value='<?php echo htmlspecialchars($o->id); ?>' <?php if($selectedValue==$o->id) echo'selected'; ?>><?php echo htmlspecialchars($o->title); ?></option>
+										<option value='<?php echo $o->id; ?>' <?php if($selectedValue==$o->id) echo'selected'; ?>><?php echo htmlspecialchars($o->title); ?></option>
 									<?php } ?>
 								</select>
 							<?php } ?>
