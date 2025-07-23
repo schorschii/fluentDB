@@ -19,7 +19,7 @@ require_once('session-options.inc.php');
 if(isset($_POST['username']) && isset($_POST['password'])) {
 	try {
 		$authenticator = new AuthenticationController($db);
-		$user = $authenticator->login($_POST['username'], $_POST['password']);
+		list($user, $lastLogin) = $authenticator->login($_POST['username'], $_POST['password']);
 		if(!$user) throw new Exception(LANG('unknown_error'));
 
 		$cl1 = new CoreLogic($db, $user);
@@ -30,6 +30,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
 		// login successful
 		$username = $db->selectAllValueByObjectCategoryField($user->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::USERNAME_FIELD_ID);
 		$db->insertLogEntry(Models\Log::LEVEL_INFO, $username, null, Models\Log::ACTION_CLIENT_WEB, ['authenticated'=>true]);
+		$_SESSION['fluentdb_last_login'] = $lastLogin;
 		$_SESSION['fluentdb_username'] = $username;
 		$_SESSION['fluentdb_user_id'] = $user->id;
 

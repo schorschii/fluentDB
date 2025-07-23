@@ -100,11 +100,11 @@ if(!empty($_GET['view'])) {
 	<?php if($initialExplorerContent != null) { ?>
 		ajaxRequest("<?php echo $initialExplorerContent.'?'.$initialExplorerContentParameter; ?>", "explorer-content");
 	<?php } ?>
-	<?php if(empty($_SESSION['oco_last_login'])) {
-		$_SESSION['oco_last_login'] = true;
-		echo "topConfettiRain();";
-		echo "emitMessage(LANG['welcome_text'], LANG['welcome_description'], MESSAGE_TYPE_INFO);";
-	} ?>
+	<?php
+	 if(empty($_SESSION['fluentdb_last_login'])) { ?>
+		topConfettiRain();
+		emitMessage(LANG['welcome_text'], LANG['welcome_description'], MESSAGE_TYPE_INFO);
+	<?php } ?>
 	<?php if(boolval($db->settings->get('check-update'))) { echo "window.setTimeout(checkUpdate, 1000);"; } ?>
 	</script>
 

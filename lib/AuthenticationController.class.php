@@ -25,13 +25,14 @@ class AuthenticationController {
 		}
 		$user = $users[0];
 		$locked = boolval($this->db->selectAllValueByObjectCategoryField($user->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::DISABLED_LOGIN_FIELD_ID));
+		$lastLogin = $this->db->selectAllValueByObjectCategoryField($user->id, CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::LAST_LOGIN_FIELD_ID);
 		if(!$locked) {
 			if($this->checkPassword($user, $password)) {
 				$cl = new CoreLogic($this->db);
 				$cl->updateCategories($user->id, [
 					new Models\UpdateField(CoreLogic::LOGIN_CATEGORY_ID, CoreLogic::LAST_LOGIN_FIELD_ID, -1, date('Y-m-d H:i:s')),
 				], true);
-				return $user;
+				return [$user, $lastLogin];
 			} else {
 				sleep(2);
 				throw new AuthenticationException(LANG('login_failed'));
