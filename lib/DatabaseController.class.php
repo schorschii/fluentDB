@@ -266,11 +266,11 @@ class DatabaseController {
 	public function selectAllCategoryValueByCategorySet($object_category_set_id) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT cf.category_id, cf.id AS "category_field_id", cf.constant, cf.title, cf.type, cf.ro,
-			ocv.value, ocv.linked_object_id, ocv.linked_dialog_value_id, ocv_dv.title AS "linked_dialog_value_title",
+			ocv.value, ocv.linked_object_id, ocv.linked_dialog_value_id, dv_l.title AS "linked_dialog_value_title",
 			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o_l.id AND ocv2.category_field_id = 1 LIMIT 1) AS "linked_object_title"
 			FROM `category_field` cf
 			LEFT JOIN object_category_value ocv ON cf.id = ocv.category_field_id AND ocv.object_category_set_id = :object_category_set_id
-			LEFT JOIN dialog_value ocv_dv ON ocv_dv.id = ocv.linked_dialog_value_id
+			LEFT JOIN dialog_value dv_l ON dv_l.id = ocv.linked_dialog_value_id
 			LEFT JOIN `object` o_l ON o_l.id = ocv.linked_object_id
 			WHERE cf.category_id = (SELECT category_id FROM object_category_set WHERE id = :object_category_set_id)
 			AND (ocv.object_category_set_id = :object_category_set_id OR ocv.object_category_set_id IS NULL)
@@ -380,7 +380,17 @@ class DatabaseController {
 		$fieldsSql = ['o.id']; $counter = 0;
 		foreach($fields as $field) {
 			$counter ++;
-			$fieldsSql[] = '(SELECT GROUP_CONCAT(`value` SEPARATOR "\n") FROM object_category_value ocv INNER JOIN object_category_set ocs ON ocs.id = ocv.object_category_set_id WHERE ocs.object_id = o.id AND ocv.category_field_id = '.intval($field->category_field_id).' GROUP BY ocv.category_field_id)';
+			$fieldsSql[] = '(SELECT GROUP_CONCAT(
+				CASE WHEN cf.type="dialog" THEN ocv_dv.title
+				WHEN cf.type LIKE "object:%" THEN (SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o_l.id AND ocv2.category_field_id = 1 LIMIT 1)
+				ELSE `value` END SEPARATOR "\n")
+			FROM object_category_value ocv
+			INNER JOIN object_category_set ocs ON ocs.id = ocv.object_category_set_id
+			INNER JOIN category_field cf ON cf.id = ocv.category_field_id
+			LEFT JOIN dialog_value ocv_dv ON ocv_dv.id = ocv.linked_dialog_value_id
+			LEFT JOIN `object` o_l ON o_l.id = ocv.linked_object_id
+			WHERE ocs.object_id = o.id AND ocv.category_field_id = '.intval($field->category_field_id).'
+			GROUP BY ocv.category_field_id)';
 		}
 		$inParams = self::compileSqlInValues($object_ids);
 		$this->stmt = $this->dbh->prepare(
