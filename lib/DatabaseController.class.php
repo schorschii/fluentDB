@@ -356,7 +356,8 @@ class DatabaseController {
 			'SELECT lvf.*, cf.category_id, cf.title FROM `list_view_field` lvf
 			INNER JOIN list_view lv ON lv.id = lvf.list_view_id
 			INNER JOIN category_field cf ON cf.id = lvf.category_field_id
-			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id = :user_object_id'
+			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id = :user_object_id
+			ORDER BY `order`'
 		);
 		$this->stmt->execute(['user_object_id' => $user_object_id, 'object_type_id' => $object_type_id]);
 		if($this->stmt->rowCount())
@@ -366,7 +367,8 @@ class DatabaseController {
 			'SELECT lvf.*, cf.category_id, cf.title FROM `list_view_field` lvf
 			INNER JOIN list_view lv ON lv.id = lvf.list_view_id
 			INNER JOIN category_field cf ON cf.id = lvf.category_field_id
-			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id IS NULL'
+			WHERE lv.object_type_id = :object_type_id AND lv.user_object_id IS NULL
+			ORDER BY `order`'
 		);
 		$this->stmt->execute(['object_type_id' => $object_type_id]);
 		if($this->stmt->rowCount())
