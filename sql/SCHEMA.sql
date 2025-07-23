@@ -320,6 +320,13 @@ ALTER TABLE `category_field`
   ADD KEY `fk__category_field__category` (`category_id`);
 
 --
+-- Indizes für die Tabelle `dialog_value`
+--
+ALTER TABLE `dialog_value`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk__dialog_value__category_field` (`category_field_id`);
+
+--
 -- Indizes für die Tabelle `group`
 --
 ALTER TABLE `group`
@@ -424,6 +431,12 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT für Tabelle `category_field`
 --
 ALTER TABLE `category_field`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
+
+--
+-- AUTO_INCREMENT für Tabelle `dialog_value`
+--
+ALTER TABLE `dialog_value`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
