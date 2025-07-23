@@ -53,7 +53,7 @@ h3 {
 	align-items: center;
 	justify-content: space-between;
 	height: 62px;
-	background-color: #314351;
+	background-color: #ff7b00;
 	color: white;
 	box-sizing: border-box;
 	padding: 5px 15px;
@@ -84,7 +84,7 @@ h3 {
 	background-color: transparent;
 	border: none;
 	box-shadow: none;
-	color: #B3B9BE;
+	color: #fffcf9;
 	text-transform: none;
 }
 #header button.active * {
@@ -127,7 +127,7 @@ h3 {
 	color: gray;
 }
 #header #search-glass {
-	background-color: #B3B9BE;
+	background-color: #fffcf9;
 	-webkit-mask: url('../img/search.dyn.svg') no-repeat center;
 	mask: url('../img/search.dyn.svg') no-repeat center;
 	width: 24px;
@@ -342,7 +342,7 @@ h3 {
 }
 #explorer-content {
 	position: relative;
-	background-color: #FAFAFA;
+	background-color: #fffcf9;
 	flex-basis: 80%;
 	padding: 20px;
 	box-sizing: border-box;
@@ -874,11 +874,11 @@ button > select {
 button.primary {
 	color: white;
 	font-weight: bold;
-	background-color: #007CBB;
+	background-color: #ff7b00;
 }
 button.primary:hover,
 button.primary:focus {
-	background-color: #004a70;
+	background-color: #cd4900;
 }
 
 .drag {
@@ -1613,7 +1613,7 @@ div.stickytable > table.list tfoot {
 	padding: 1px 6px;
 	margin: 1px 4px;
 	border-radius: 999px;
-	background-color: #314351;
+	background-color: #ff7b00;
 	color: white;
 }
 
@@ -1678,14 +1678,14 @@ div.stickytable > table.list tfoot {
 
 @media (prefers-color-scheme: dark) {
 	html, #explorer-content {
-		background-color: #0d1117;
+		background-color: black;
 	}
 	#explorer-tree, #login-form, #dialog-container #dialog-box, #header #search-results {
-		background-color: #161b22;
+		background-color: rgb(31, 24, 18);
 		border-color: rgba(255,255,255,0.1);
 	}
 	.gallery > .item {
-		background-color: #161b22;
+		background-color: rgb(31, 24, 18);
 	}
 	#login-bg {
 		filter: grayscale(15%) contrast(85%) brightness(70%);
@@ -1714,11 +1714,11 @@ div.stickytable > table.list tfoot {
 	.blockListItem:focus, .blockListItem:focus-within,
 	.blockListItem:hover,
 	.blockListItem:active {
-		background-color: #30363d;
+		background-color: rgb(41, 34, 28);
 	}
 	#header input:focus {
 		color: white;
-		background-color: #141414;
+		background-color: rgb(41, 34, 28);
 	}
 	#header input:focus::placeholder {
 		color: gray;
@@ -1750,7 +1750,7 @@ div.stickytable > table.list tfoot {
 	table.list, .box,
 	div.stickytable > table.list thead,
 	div.stickytable > table.list tfoot {
-		background-color: #161b22;
+		background-color: rgb(31, 24, 18);
 	}
 	table.list tr th, table.list tr td {
 		border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -1776,7 +1776,7 @@ div.stickytable > table.list tfoot {
 	button,
 	input:not([type=range]):not([type=radio]):not([type=checkbox]), select, textarea {
 		color: white;
-		background-color: #21262d;
+		background-color: rgb(35, 28, 23);
 		border-color: rgba(255,255,255,0.1);
 		box-shadow: none;
 	}
@@ -1788,23 +1788,16 @@ div.stickytable > table.list tfoot {
 	button:hover, button:focus,
 	input:not([type=range]):not([type=radio]):not([type=checkbox]):focus,
 	textarea:focus, select:focus {
-		background-color: #30363d;
+		background-color: rgb(51, 44, 38);
 		box-shadow: none;
 	}
 	input:not([type=range]):not([type=radio]):not([type=checkbox]):focus,
 	textarea:focus, select:focus {
 		border-color: rgba(255,255,255,0.2);
 	}
-	button.primary {
-		background-color: #006193;
-	}
-	button.primary:hover,
-	button.primary:focus {
-		background-color: #004a70;
-	}
 	button:disabled {
 		color: #484f58 !important;
-		background-color: #21262d !important;
+		background-color: rgb(35, 28, 23) !important;
 	}
 	.progressbar-container > .progresstext {
 		background: linear-gradient(to right, black var(--progress,0%), white 0);
