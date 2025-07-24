@@ -122,7 +122,7 @@ function openTab(tabControl, tabName, forceRefresh=false) {
 		}
 	}
 	let refresh = (forceRefresh && getCurrentUrlParameter('tab') != tabName);
-	rewriteUrlContentParameter(currentExplorerContentUrl, {'tab':tabName});
+	rewriteUrlContentParameter({'tab':tabName});
 	if(refresh) refreshContent();
 }
 
@@ -544,7 +544,10 @@ function refreshContent(callback=null, handleAutoRefresh=false) {
 	}, false, !handleAutoRefresh);
 }
 function scheduleNextContentRefresh() {
-	refreshContentTimer = setTimeout(function(){ refreshContent(null, true) }, REFRESH_CONTENT_TIMEOUT);
+	if(refreshContentTimer) {
+		clearTimeout(refreshContentTimer);
+	}
+	refreshContentTimer = setTimeout(refreshContent, REFRESH_CONTENT_TIMEOUT, null, true);
 }
 function toggleAutoRefresh(force=null) {
 	let newState = (refreshContentTimer == null);

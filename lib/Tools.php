@@ -47,27 +47,6 @@ function niceTime($seconds) {
 	else return round($seconds/60/60/24).' '.LANG('days');
 }
 
-function wrapInSpanIfNotEmpty($text) {
-	if($text == null || $text == '') return '';
-	return '<span>'.htmlspecialchars($text).'</span>';
-}
-
-function progressBar($percent, $cid=null, $tid=null, $class=''/*hidden big stretch animated*/, $style='') {
-	$percent = intval($percent);
-	return
-		'<span class="progressbar-container '.$class.'" style="--progress:'.$percent.'%; '.$style.'" '.($cid==null ? '' : 'id="'.htmlspecialchars($cid).'"').'>'
-			.'<span class="progressbar"><span class="progress"></span></span>'
-			.'<span class="progresstext" '.($tid==null ? '' : 'id="'.htmlspecialchars($tid).'"').'>'.(strpos($class,'animated')!==false ? LANG('in_progress') : $percent.'%').'</span>'
-		.'</span>';
-}
-
-function explorerLink($explorerContentUrl, $extraJs='') {
-	$fileString = basename(parse_url($explorerContentUrl, PHP_URL_PATH), '.php');
-	$parameterString = parse_url($explorerContentUrl, PHP_URL_QUERY);
-	return "href='index.php?view=".urlencode($fileString)."&".$parameterString."'"
-		." onclick='event.preventDefault();".$extraJs.";refreshContentExplorer(\"".$explorerContentUrl."\")'";
-}
-
 function randomString($length = 30) {
 	$characters = '0123456789abcdefghijklmnopqrstuvwxyz';
 	$charactersLength = strlen($characters);

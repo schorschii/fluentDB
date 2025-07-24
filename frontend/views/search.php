@@ -62,7 +62,7 @@ if(count($items) == 0) {
 						<?php echo htmlspecialchars($item->object_type_title); ?>
 					</td>
 					<td>
-						<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink('views/object.php?id='.$item->id); ?>><?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?></a>
+						<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/object.php?id='.$item->id); ?>><?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?></a>
 					</td>
 				</tr>
 			<?php } ?>
@@ -89,7 +89,7 @@ if(count($items) == 0) {
 
 <?php foreach($items as $item) { ?>
 	<div class='node'>
-		<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink('views/object.php?id='.$item->id, 'closeSearchResults()'); ?>>
+		<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/object.php?id='.$item->id, 'closeSearchResults()'); ?>>
 			<?php if($item->object_type_image) { ?><img src='<?php echo base64image($item->object_type_image); ?>'><?php } ?>
 			<?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?>
 		</a>
@@ -97,7 +97,7 @@ if(count($items) == 0) {
 <?php } ?>
 <?php if($moreAvail) { ?>
 	<div class='node'>
-		<a onkeydown='handleSearchResultNavigation(event)' <?php echo explorerLink('views/search.php?context=more&query='.urlencode($_GET['query']), 'closeSearchResults()'); ?>><img src='img/eye.dyn.svg'><?php echo LANG('more'); ?></a>
+		<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/search.php?context=more&query='.urlencode($_GET['query']), 'closeSearchResults()'); ?>><img src='img/eye.dyn.svg'><?php echo LANG('more'); ?></a>
 	</div>
 <?php } ?>
 

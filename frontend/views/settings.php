@@ -9,5 +9,5 @@ require_once('../session.inc.php');
 </div>
 
 <div class='actionmenu'>
-	<a <?php echo explorerLink('views/settings-configuration.php'); ?>>&rarr;&nbsp;<?php echo LANG('configuration_overview'); ?></a>
+	<a <?php echo Html::explorerLink('views/settings-configuration.php'); ?>>&rarr;&nbsp;<?php echo LANG('configuration_overview'); ?></a>
 </div>

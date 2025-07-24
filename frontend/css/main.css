@@ -28,6 +28,9 @@ body {
 body.loading {
 	cursor: wait;
 }
+a.nocolor {
+	color: inherit;
+}
 h1 {
 	font-size: 24px;
 	font-weight: 200;
@@ -1272,7 +1275,6 @@ div.details-abreast {
 	display: flex;
 	align-items: flex-start;
 	column-gap: 25px;
-	margin-bottom: 25px;
 }
 div.details-abreast > div h1,
 div.details-abreast > div h2,

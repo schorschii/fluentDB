@@ -75,7 +75,7 @@ try {
 									if(empty($cv->linked_object_title)) echo '&nbsp;';
 									else {
 										$selectedValue = $cv->linked_object_id;
-										echo '<a '.explorerLink('views/object.php?id='.intval($cv->linked_object_id)).'>'.htmlspecialchars($cv->linked_object_title).'</a>';
+										echo '<a '.Html::explorerLink('views/object.php?id='.intval($cv->linked_object_id)).'>'.htmlspecialchars($cv->linked_object_title).'</a>';
 									}
 								} else {
 									echo empty($cv->value) ? '&nbsp;' : nl2br(htmlspecialchars($cv->value));

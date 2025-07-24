@@ -9,7 +9,7 @@ require_once('../session.inc.php');
 	<a><img src='img/folder.dyn.svg'><?php echo htmlspecialchars(LANG($otg->title)); ?></a>
 	<div class='subitems'>
 		<?php foreach($db->selectAllObjectTypeByObjectTypeGroup($otg->id) as $ot) { ?>
-		<a <?php echo explorerLink('views/objects.php?id='.$ot->id); ?>>
+		<a <?php echo Html::explorerLink('views/objects.php?id='.$ot->id); ?>>
 			<?php if($ot->image) { ?><img src='<?php echo base64image($ot->image); ?>'><?php } ?>
 			<?php echo htmlspecialchars(LANG($ot->title)); ?>
 		</a>

@@ -57,7 +57,7 @@ try {
 					if($counter == 1 && empty($value)) $value = htmlspecialchars(LANG('empty_placeholder'));
 					elseif(empty($value)) $value = '&nbsp;';
 					else $value = nl2br(htmlspecialchars($value));
-					echo "<td><a ".explorerLink('views/object.php?id='.intval($ofv[0])).">".$value."</td>";
+					echo "<td><a ".Html::explorerLink('views/object.php?id='.intval($ofv[0]))." class='".($counter>1 ? 'nocolor' : '')."'>".$value."</td>";
 				}
 				$counter ++;
 			}
