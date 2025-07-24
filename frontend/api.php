@@ -62,7 +62,7 @@ try {
 			throw new AuthenticationException(LANG('username_cannot_be_empty'));
 		}
 		$authenticator = new AuthenticationController($db);
-		$user = $authenticator->login($username, $password);
+		list($user, $lastLogin) = $authenticator->login($username, $password);
 		if(!$user) {
 			throw new AuthenticationException(LANG('unknown_error'));
 		}
@@ -109,7 +109,6 @@ if(array_is_list($srcdata)) {
 
 // return response(s)
 header('Content-Type: application/json');
-#error_log(json_encode($multi ? $resdata : $resdata[0], JSON_PARTIAL_OUTPUT_ON_ERROR));
 echo json_encode($multi ? $resdata : $resdata[0], JSON_PARTIAL_OUTPUT_ON_ERROR);
 
 
@@ -165,20 +164,24 @@ function handleJsonRequest($request) {
 				break;
 
 			case 'cmdb.object.create':
-				$db->insertObject();
+				$resultId = $db->insertObject($params['type'] ?? -1);
+				$cl->updateCategories($resultId, [
+					new Models\UpdateField(CoreLogic::GENERAL_CATEGORY_ID, CoreLogic::TITLE_FIELD_ID, -1, $params['title'] ?? ''),
+				]);
 				$response['result'] = [
-					'success' => true, 'data' => []
+					'success' => true, 'id' => $resultId
 				];
 				break;
 
 			case 'idoit.search':
 			case 'fluentdb.search':
 				$results = [];
-				foreach($db->searchAllObject($params['q'] ?? '') as $r) {
+				$search = $params['q'] ?? '';
+				foreach($db->searchAllObject($search) as $r) {
 					$results[] = [
 						'documentId' => strval($r->id),
 						'key' => 'title',
-						'value' => $r->title,
+						'value' => $r->title===$search ? $r->title : $r->title.': '.$r->value,
 						'type' => 'cmdb',
 						'link' => '/index.php?view=object&id='.$r->id,
 						'score' => 1,
@@ -302,6 +305,7 @@ function handleJsonRequest($request) {
 				$response['result'] = $values;
 				break;
 
+			case 'cmdb.category.create':
 			case 'cmdb.category.update':
 				if(empty($data) || empty($params['category']) || empty($params['objID']))
 					throw new InvalidRequestException();
@@ -312,8 +316,23 @@ function handleJsonRequest($request) {
 				foreach($data as $key => $value) {
 					if($key == 'category_id') continue;
 					$field = $db->selectCategoryFieldByCategoryConstant($category->id, $key);
-					if(!$field)
-						throw new NotFoundException();
+					if(!$field) throw new NotFoundException();
+
+					// if it is a dialog or object field and no int was given, find the correct ID
+					if(!is_int($value) && $field->type == 'dialog') {
+						$linkedDialogValue = $db->selectDialogValueByCategoryFieldTitle($field->id, $value);
+						if($linkedDialogValue) {
+							$value = $linkedDialogValue->id;
+						} else {
+							// create new dialog value
+							$value = $db->insertDialogValue($field->id, $value);
+						}
+					} elseif(!is_int($value) && substr($field->type,0,6) == 'object') {
+						$linkedObject = $db->selectObjectByTitle($value);
+						if(!$linkedObject) throw new NotFoundException();
+						$value = $linkedObject->id;
+					}
+
 					$updates[] = new Models\UpdateField($category->id, $field->id, $data['category_id'] ?? -1, $value);
 				}
 				$cl->updateCategories(intval($params['objID']), $updates);
@@ -334,11 +353,12 @@ function handleJsonRequest($request) {
 				];
 				break;
 
+			case 'cmdb.objects':
 			case 'cmdb.objects.read':
-				if(!empty($params['filter']['type']))
-					$objects = $db->selectAllObjectByObjectType($params['filter']['type']);
 				$results = [];
-				foreach($objects as $object) {
+				foreach($db->selectAllObject() as $object) {
+					if(!empty($params['filter']['type']) && $params['filter']['type'] != $object->object_type_id) continue;
+					if(!empty($params['filter']['title']) && $params['filter']['title'] != $object->title) continue;
 					$results[] = [
 						'id' => $object->id,
 						'title' => $object->title,

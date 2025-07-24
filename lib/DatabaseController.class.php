@@ -165,6 +165,15 @@ class DatabaseController {
 			return $row;
 		}
 	}
+	public function selectAllObject() {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT o.*,
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
+			FROM `object` o'
+		);
+		$this->stmt->execute();
+		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj');
+	}
 	public function selectAllObjectByObjectType($object_type_id) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT o.*,
@@ -181,6 +190,17 @@ class DatabaseController {
 			FROM `object` o WHERE id = :id'
 		);
 		$this->stmt->execute([':id' => $id]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
+			return $row;
+		}
+	}
+	public function selectObjectByTitle($title) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT o.*,
+			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
+			FROM `object` o WHERE title = :title'
+		);
+		$this->stmt->execute([':title' => $title]);
 		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
 			return $row;
 		}
@@ -230,12 +250,28 @@ class DatabaseController {
 			return $row;
 		}
 	}
+	public function selectDialogValueByCategoryFieldTitle($category_field_id, $title) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `dialog_value` WHERE category_field_id = :category_field_id AND title = :title'
+		);
+		$this->stmt->execute([':category_field_id' => $category_field_id, ':title' => $title]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\DialogValue') as $row) {
+			return $row;
+		}
+	}
 	public function selectAllDialogValueByCategoryField($id) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT * FROM `dialog_value` WHERE category_field_id = :category_field_id'
 		);
 		$this->stmt->execute([':category_field_id' => $id]);
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\DialogValue');
+	}
+	public function insertDialogValue($category_field_id, $title) {
+		$this->stmt = $this->dbh->prepare(
+			'INSERT INTO `dialog_value` (category_field_id, title) VALUES (:category_field_id, :title)'
+		);
+		$this->stmt->execute([':category_field_id' => $category_field_id, 'title' => $title]);
+		return $this->dbh->lastInsertId();
 	}
 	public function selectAllCategoryByObjectType($object_type_id) {
 		$this->stmt = $this->dbh->prepare(
