@@ -1,9 +1,9 @@
 # Server Installation
 
 ## Basic Setup
-0. Install PHP 7.x (with ZIP & DOM modules), MySQL/MariaDB and Apache2 on a Linux server (Debian recommended).
+0. Install PHP 7.x (with mbstring module), MySQL/MariaDB and Apache2 on a Linux server (Debian recommended).
    ```
-   apt install php php-zip php-dom mariadb-server apache2 libapache2-mod-php
+   apt install php php-mbstring mariadb-server apache2 libapache2-mod-php
    ```
 1. Download the [latest release](https://github.com/schorschii/fluentdb/releases) and copy/extract all files into `/srv/www/fluentdb`.
 2. Configure your Apache webserver

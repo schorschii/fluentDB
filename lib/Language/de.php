@@ -19,7 +19,7 @@ return [
 	'please_enter_a_search_term' => 'Bitte geben Sie einen Suchbegriff ein',
 	'no_search_results' => 'Keine Suchergebnisse',
 	'more' => 'Mehr...',
-	'search_results_for' => 'Search results for »%s«',
+	'search_results_for' => 'Suchergebnisse für »%s«',
 	'change' => 'Ändern',
 	'new_password' => 'Neues Passwort',
 	'confirm_password' => 'Passwort bestätigen',

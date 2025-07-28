@@ -7,6 +7,7 @@ if(empty($_GET['query'])) {
 	die('<div class="alert info nomargin">'.LANG('please_enter_a_search_term').'</div>');
 }
 
+const EXCERPT_PADDING = 20;
 $maxResults = 5;
 $more = false;
 if(!empty($_GET['context']) && $_GET['context'] === 'more') {
@@ -21,6 +22,9 @@ foreach($db->searchAllObject($_GET['query']) as $o) {
 	$counter ++;
 	#if(!$cl->checkPermission($o, PermissionManager::METHOD_READ, false)) continue; // TODO
 	if($counter > $maxResults) { $moreAvail = true; break; }
+	if($o->category_field_id != CoreLogic::TITLE_FIELD_ID) {
+		$o->subtitle = htmlspecialchars(LANG($o->category_field_title)).': '.substrExcerpt(htmlspecialchars($_GET['query']), $o->value, mb_strlen(htmlspecialchars($_GET['query'])));
+	}
 	$items[] = $o;
 }
 
@@ -33,6 +37,24 @@ foreach($ext->getAggregatedConf('frontend-search-function') as $func) {
 		if($counter > $maxResults) { $moreAvail = true; break; }
 		$items[] = $sr;
 	}
+}
+
+function substrExcerpt($search, $text, $searchLength) {
+	$textLength = mb_strlen($text);
+	if($textLength < $searchLength + (EXCERPT_PADDING*2)) {
+		return highlightSearchTextString($search, $text);
+	}
+	$pos = strpos($text, $search);
+	if($pos === false) {
+		$pos = 0;
+	}
+	$prefix = $pos > EXCERPT_PADDING ? '…' : '';
+	$suffix = $pos < $textLength - EXCERPT_PADDING - $searchLength ? '…' : '';
+	$excerpt = $prefix . mb_substr($text, $pos - EXCERPT_PADDING > 0 ? $pos - EXCERPT_PADDING : 0, $searchLength + (EXCERPT_PADDING*2)) . $suffix;
+	return highlightSearchTextString($search, $excerpt);
+}
+function highlightSearchTextString($search, $string) {
+	return preg_replace('/(' . preg_quote($search) . ')/i', '<b>$1</b>', $string);
 }
 
 if(count($items) == 0) {
@@ -62,7 +84,10 @@ if(count($items) == 0) {
 						<?php echo htmlspecialchars($item->object_type_title); ?>
 					</td>
 					<td>
-						<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/object.php?id='.$item->id); ?>><?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?></a>
+						<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/object.php?id='.$item->id); ?>>
+							<?php echo htmlspecialchars($item->title); ?>
+							<div class='hint'><?php echo $item->subtitle; ?></div>
+						</a>
 					</td>
 				</tr>
 			<?php } ?>
@@ -91,7 +116,8 @@ if(count($items) == 0) {
 	<div class='node'>
 		<a onkeydown='handleSearchResultNavigation(event)' <?php echo Html::explorerLink('views/object.php?id='.$item->id, 'closeSearchResults()'); ?>>
 			<?php if($item->object_type_image) { ?><img src='<?php echo base64image($item->object_type_image); ?>'><?php } ?>
-			<?php echo htmlspecialchars($item->title.($o->category_field_id!=1 ? ' ('.LANG($o->category_field_title).')' : '')); ?>
+			<?php echo htmlspecialchars($item->title); ?>
+			<div class='hint'><span><?php echo $item->subtitle; ?></span></div>
 		</a>
 	</div>
 <?php } ?>

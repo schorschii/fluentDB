@@ -9,4 +9,7 @@ class SearchResult {
 	public $object_type_title;
 	public $object_type_image;
 
+	// calculcated values
+	public $subtitle = '';
+
 }
