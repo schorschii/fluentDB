@@ -31,11 +31,11 @@ body.loading {
 a {
 	color: #ff7b00;
 }
-a:active {
-	color: red;
-}
 a.nocolor {
 	color: inherit;
+}
+a:active {
+	color: red;
 }
 h1 {
 	font-size: 24px;
@@ -1734,7 +1734,7 @@ div.stickytable > table.list tfoot {
 	#header #search-glass.focus {
 		background-color: white;
 	}
-	body, a, #header #search-results,
+	body, #header #search-results,
 	#explorer-content .details-abreast h1,
 	#explorer-content .details-abreast h2,
 	#explorer-content .details-abreast h3,
