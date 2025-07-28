@@ -94,7 +94,7 @@ class DatabaseController {
 			INNER JOIN `object_category_set` ocs ON ocs.id = ocv.object_category_set_id
 			INNER JOIN `object` o ON o.id = ocs.object_id
 			INNER JOIN `object_type` ot ON ot.id = o.object_type_id
-			WHERE ocv.`value` LIKE :search
+			WHERE ocv.`value` LIKE :search AND cf.search = 1
 			GROUP BY o.id'
 			.($limit==null ? '' : 'LIMIT '.intval($limit))
 		);

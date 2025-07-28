@@ -55,6 +55,7 @@ CREATE TABLE `category_field` (
   `title` text NOT NULL,
   `type` text NOT NULL,
   `ro` tinyint(4) NOT NULL DEFAULT 0,
+  `search` TINYINT NOT NULL DEFAULT 1,
   `order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -62,26 +63,26 @@ CREATE TABLE `category_field` (
 -- Daten für Tabelle `category_field`
 --
 
-INSERT INTO `category_field` (`id`, `category_id`, `constant`, `title`, `type`, `ro`, `order`) VALUES
-(1, 1, 'title', 'title', 'text', 0, 0),
-(2, 1, 'general-sep1', '', 'separator', 0, 1),
-(3, 1, 'category', 'category', 'dialog_plus', 0, 2),
-(4, 1, 'purpose', 'purpose', 'dialog_plus', 0, 3),
-(5, 1, 'cmdb_status', 'cmdb_status', 'dialog', 0, 4),
-(6, 1, 'tag', 'tag', 'multiselect', 0, 5),
-(7, 1, 'general-sep2', '', 'separator', 0, 6),
-(8, 1, 'sysid', 'sysid', 'text', 0, 7),
-(9, 1, 'created', 'created', 'datetime', 1, 8),
-(10, 1, 'created_by', 'created_by', 'text', 1, 9),
-(11, 1, 'changed', 'changed', 'datetime', 1, 10),
-(12, 1, 'changed_by', 'changed_by', 'text', 1, 11),
-(13, 1, 'general-sep3', '', 'separator', 0, 12),
-(14, 1, 'description', 'description', 'text-multiline', 0, 13),
-(15, 2, 'disabled_login', 'login_disabled', 'dialog', 0, 0),
-(16, 2, 'username', 'username', 'text', 0, 1),
-(17, 2, 'password', 'password', 'text', 1, 2),
-(18, 2, 'uid', 'unique_identifier', 'text', 1, 3),
-(19, 2, 'last_login', 'last_login', 'datetime', 1, 4);
+INSERT INTO `category_field` (`id`, `category_id`, `constant`, `title`, `type`, `ro`, `search`, `order`) VALUES
+(1, 1, 'title', 'title', 'text', 0, 1, 0),
+(2, 1, 'general-sep1', '', 'separator', 0, 1, 1),
+(3, 1, 'category', 'category', 'dialog_plus', 0, 1, 2),
+(4, 1, 'purpose', 'purpose', 'dialog_plus', 0, 1, 3),
+(5, 1, 'cmdb_status', 'cmdb_status', 'dialog', 0, 1, 4),
+(6, 1, 'tag', 'tag', 'multiselect', 0, 1, 5),
+(7, 1, 'general-sep2', '', 'separator', 0, 1, 6),
+(8, 1, 'sysid', 'sysid', 'text', 0, 1, 7),
+(9, 1, 'created', 'created', 'datetime', 1, 1, 8),
+(10, 1, 'created_by', 'created_by', 'text', 1, 1, 9),
+(11, 1, 'changed', 'changed', 'datetime', 1, 1, 10),
+(12, 1, 'changed_by', 'changed_by', 'text', 1, 1, 11),
+(13, 1, 'general-sep3', '', 'separator', 0, 1, 12),
+(14, 1, 'description', 'description', 'text-multiline', 0, 1, 13),
+(15, 2, 'disabled_login', 'login_disabled', 'dialog', 0, 1, 0),
+(16, 2, 'username', 'username', 'text', 0, 1, 1),
+(17, 2, 'password', 'password', 'text', 1, 0, 2),
+(18, 2, 'uid', 'unique_identifier', 'text', 1, 0, 3),
+(19, 2, 'last_login', 'last_login', 'datetime', 1, 1, 4);
 
 -- --------------------------------------------------------
 
