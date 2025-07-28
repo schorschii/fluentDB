@@ -28,6 +28,12 @@ body {
 body.loading {
 	cursor: wait;
 }
+a {
+	color: #ff7b00;
+}
+a:active {
+	color: red;
+}
 a.nocolor {
 	color: inherit;
 }
@@ -101,7 +107,7 @@ h3 {
 	display: inline-block;
 	height: 30px;
 	width: 1px;
-	background-color: #B3B9BE;
+	background-color: rgb(220,220,220);
 	opacity: 0.2;
 }
 #header span.separator.space {
@@ -112,7 +118,7 @@ h3 {
 #header input {
 	padding: 8px 10px;
 	padding-left: 32px; /* for glass icon */
-	color: #B3B9BE;
+	color: rgb(220,220,220);
 	background-color: transparent;
 	box-shadow: none;
 	border: none;
@@ -120,7 +126,7 @@ h3 {
 	width: 100%;
 }
 #header input::placeholder {
-	color: #B3B9BE;
+	color: rgb(220,220,220);
 }
 #header input:focus {
 	color: black;
