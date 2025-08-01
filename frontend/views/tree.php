@@ -6,7 +6,7 @@ require_once('../session.inc.php');
 
 <?php foreach($db->selectAllObjectTypeGroup() as $otg) { ?>
 <div id='divNodeObjectTypeGroup<?php echo $otg->id; ?>' class='node expandable'>
-	<a><img src='img/folder.dyn.svg'><?php echo htmlspecialchars(LANG($otg->title)); ?></a>
+	<a <?php echo Html::explorerLink('views/objects.php', ''); ?>><img src='img/folder.dyn.svg'><?php echo htmlspecialchars(LANG($otg->title)); ?></a>
 	<div class='subitems'>
 		<?php foreach($db->selectAllObjectTypeByObjectTypeGroup($otg->id) as $ot) { ?>
 		<a <?php echo Html::explorerLink('views/objects.php?id='.$ot->id); ?>>

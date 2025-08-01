@@ -8,7 +8,7 @@ class LicenseCheck {
 	   Please be so kind and support further development by purchasing licenses from https://georg-sieber.de
 	*/
 
-	const FREE_OBJECTS          = 100;
+	const FREE_OBJECTS          = 1000;
 	const DATE_FORMAT           = 'Y-m-d';
 
 	private $currentObjectCount = 0;
