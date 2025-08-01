@@ -41,14 +41,24 @@ $license = new LicenseCheck($db);
 		</div>
 		<hr/>
 		<div>
-			<div>
-				<img src='img/itinventory.png' style='max-height:120px'>
+			<div class='appad'>
+				<img src='img/itinventory.png'>
+				<div class='description'>
+					<h3>itInventory - CMDB Scan-App</h3>
+					<div>
+						<a href='https://play.google.com/store/apps/details?id=systems.sieber.itinventory' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
+						<a href='https://apps.apple.com/de/app/itinventory-i-doit-scanner/id1442661035' target='_blank'><img src='img/appstore-badge.svg' style='max-height:50px'></a>
+					</div>
+				</div>
 			</div>
-			<div>
-				<h3>itInventory - CMDB Scan-App</h3>
-				<div>
-					<a href='https://play.google.com/store/apps/details?id=systems.sieber.itinventory' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
-					<a href='https://apps.apple.com/de/app/itinventory-i-doit-scanner/id1442661035' target='_blank'><img src='img/appstore-badge.svg' style='max-height:50px'></a>
+			<div class='appad'>
+				<img src='img/itdelivery.png'>
+				<div class='description'>
+					<h3>itDelivery - CMDB Übergabe-App</h3>
+					<div>
+						<div class='hint'>coming soon</div>
+						<a href='https://play.google.com/store/apps/details?id=systems.sieber.itdelivery' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
+					</div>
 				</div>
 			</div>
 		</div>

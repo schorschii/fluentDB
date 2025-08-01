@@ -957,6 +957,12 @@ img.dragicon {
 #homepage .subtitle2 {
 	font-weight: bold;
 }
+.appad h3 {
+	margin-top: 0px;
+}
+.appad img {
+	max-height: 120px
+}
 .stats > div {
 	display: flex;
 	flex-wrap: wrap;
