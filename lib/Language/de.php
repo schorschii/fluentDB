@@ -88,6 +88,7 @@ return [
 	'action' => 'Aktion',
 	'add' => 'Hinzufügen',
 	'object_type' => 'Objekttyp',
+	'not_found' => 'Nicht gefunden',
 
 	// default category "general"
 	'title' => 'Titel',

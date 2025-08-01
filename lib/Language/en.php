@@ -93,6 +93,7 @@ return [
 	'action' => 'Action',
 	'add' => 'Add',
 	'object_type' => 'Object Type',
+	'not_found' => 'Not found',
 
 	// default category "General"
 	'title' => 'Title',
