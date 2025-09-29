@@ -283,20 +283,26 @@ function handleJsonRequest($request) {
 						$fieldInfo = $db->selectCategoryField($v->category_field_id);
 						if(!$fieldInfo) throw new NotFoundException();
 						if($fieldInfo->type == 'dialog')
-							$value[$v->constant] = [
-								'id' => $v->linked_dialog_value_id,
-								'title' => $v->linked_dialog_value_title,
-								'const' => null,
-							];
+							if($v->linked_dialog_value_id === null)
+								$value[$v->constant] = null;
+							else
+								$value[$v->constant] = [
+									'id' => $v->linked_dialog_value_id,
+									'title' => $v->linked_dialog_value_title,
+									'const' => null,
+								];
 						elseif(substr($fieldInfo->type,0,6) == 'object')
-							$value[$v->constant] = [
-								'id' => $v->linked_object_id,
-								'title' => $v->linked_object_title,
-								'sysid' => null,
-								'type' => null,
-								'type_title' => null,
-								'location_path' => null,
-							];
+							if($v->linked_object_id === null)
+								$value[$v->constant] = null;
+							else
+								$value[$v->constant] = [
+									'id' => $v->linked_object_id,
+									'title' => $v->linked_object_title,
+									'sysid' => null,
+									'type' => null,
+									'type_title' => null,
+									'location_path' => null,
+								];
 						else
 							$value[$v->constant] = $v->value;
 					}
