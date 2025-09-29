@@ -58,7 +58,7 @@ try {
 		<div id='divCategory<?php echo $c->id; ?>' class='details-abreast category <?php if($cs->id<0 && $c->multivalue) echo 'template'; ?>' set='<?php echo $cs->id; ?>'>
 			<div>
 				<table class='list form metadata category'>
-					<?php foreach($cs->id<0 ? $db->selectAllCategoryValueByCategory($c->id, $object->id) : $db->selectAllCategoryValueByCategorySet($cs->id, $object->id) as $cv) { ?>
+					<?php foreach($cs->id<0 ? $db->selectAllCategoryValueByCategory($c->id, $object->id) : $db->selectAllCategoryValueByCategorySet($cs->id) as $cv) { ?>
 					<tr>
 						<th><?php echo htmlspecialchars(LANG($cv->title)); ?></th>
 						<td class='dualInput'>
