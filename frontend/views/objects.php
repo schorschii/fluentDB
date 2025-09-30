@@ -33,7 +33,7 @@ try {
 
 <div class='details-abreast'>
 	<div class='stickytable'>
-		<table id='tblObjectData' class='list searchable sortable savesort objects'>
+		<table id='tblObjectData<?php echo $ot->id; ?>' class='list searchable sortable savesort objects'>
 		<thead>
 			<tr>
 				<th><input type='checkbox' class='toggleAllChecked'></th>
