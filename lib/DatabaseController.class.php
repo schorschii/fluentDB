@@ -178,7 +178,8 @@ class DatabaseController {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT o.*,
 			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
-			FROM `object` o WHERE object_type_id = :object_type_id'
+			FROM `object` o WHERE object_type_id = :object_type_id
+			ORDER BY title'
 		);
 		$this->stmt->execute(['object_type_id' => $object_type_id]);
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj');
@@ -261,7 +262,7 @@ class DatabaseController {
 	}
 	public function selectAllDialogValueByCategoryField($id) {
 		$this->stmt = $this->dbh->prepare(
-			'SELECT * FROM `dialog_value` WHERE category_field_id = :category_field_id'
+			'SELECT * FROM `dialog_value` WHERE category_field_id = :category_field_id ORDER BY title'
 		);
 		$this->stmt->execute([':category_field_id' => $id]);
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\DialogValue');
