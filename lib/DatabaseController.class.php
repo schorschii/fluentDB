@@ -208,7 +208,7 @@ class DatabaseController {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT o.*,
 			(SELECT `value` FROM `object_category_value` ocv2 INNER JOIN `object_category_set` ocs2 ON ocs2.id = ocv2.object_category_set_id WHERE ocs2.object_id = o.id AND ocv2.category_field_id = 1 LIMIT 1) AS "title"
-			FROM `object` o WHERE title = :title'
+			FROM `object` o HAVING title = :title'
 		);
 		$this->stmt->execute([':title' => $title]);
 		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\Obj') as $row) {
