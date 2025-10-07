@@ -249,6 +249,7 @@ CREATE TABLE `object_type` (
   `id` int(11) NOT NULL,
   `object_type_group_id` int(11) DEFAULT NULL,
   `title` text NOT NULL,
+  `container` TINYINT NOT NULL DEFAULT '0',
   `image` mediumblob DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

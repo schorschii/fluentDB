@@ -150,7 +150,8 @@ function handleJsonRequest($request) {
 					$objectTypes[] = [
 						'id' => strval($ot->id),
 						'title' => LANG($ot->title),
-						'container' => 0,
+						'const' => $ot->id,
+						'container' => $ot->container,
 						'color' => '000000',
 						'image' => base64_encode($ot->image),
 						'icon' => '',
@@ -239,16 +240,19 @@ function handleJsonRequest($request) {
 				$categoryId = $params['catgID'] ?? $params['catsID'] ?? $params['customID'] ?? null;
 				if(!$categoryId) {
 					$category = $db->selectCategoryByConstant($params['category'] ?? '');
-					if(!$category) throw new NotFoundException();
+					if(!$category) throw new NotFoundException($params['category'] ?? '');
 					$categoryId = $category->id;
 				}
 				foreach($db->selectAllCategoryFieldByCategory($categoryId) as $cf) {
+					$type = 'text';
+					if($cf->type == 'dialog') $type = 'dialog';
+					elseif(substr($cf->type,0,6) == 'object') $type = 'object_browser';
 					$response['result'][$cf->constant] = [
-						'title' => $cf->title,
+						'title' => LANG($cf->title),
 						'check' => ['mandatory' => false],
 						'info' => [
 							'primary_field' => false,
-							'type' => 'text',
+							'type' => $type,
 							'backward' => false,
 							'title' => $cf->title,
 							'description' => '',
@@ -260,7 +264,7 @@ function handleJsonRequest($request) {
 							'field' => '',
 						],
 						'ui' => [
-							'type' => 'text',
+							'type' => $type,
 							'default' => null,
 							'params' => ['p_nMaxLen' => 255],
 							'id' => $cf->title,
@@ -273,7 +277,7 @@ function handleJsonRequest($request) {
 			case 'cmdb.category.read':
 				$values = [];
 				$category = $db->selectCategoryByConstant($params['category'] ?? -1);
-				if(!$category) throw new NotFoundException();
+				if(!$category) throw new NotFoundException($params['category'] ?? -1);
 				foreach($db->selectAllCategorySetByCategoryObject($category->id, $params['objID'] ?? -1) as $cs) {
 					$value = [
 						'id' => $cs->id,
@@ -317,7 +321,7 @@ function handleJsonRequest($request) {
 					throw new InvalidRequestException();
 				$category = $db->selectCategoryByConstant($params['category']);
 				if(!$category)
-					throw new NotFoundException();
+					throw new NotFoundException($params['category']);
 				$updates = [];
 				foreach($data as $key => $value) {
 					if($key == 'category_id') continue;
@@ -335,7 +339,7 @@ function handleJsonRequest($request) {
 						}
 					} elseif(!is_int($value) && substr($field->type,0,6) == 'object') {
 						$linkedObject = $db->selectObjectByTitle($value);
-						if(!$linkedObject) throw new NotFoundException();
+						if(!$linkedObject) throw new NotFoundException($value);
 						$value = $linkedObject->id;
 					}
 
@@ -386,9 +390,9 @@ function handleJsonRequest($request) {
 			case 'cmdb.dialog.read':
 				$values = [];
 				$c = $db->selectCategoryByConstant($params['category']);
-				if(!$c) throw new NotFoundException();
+				if(!$c) throw new NotFoundException($params['category']);
 				$cf = $db->selectCategoryFieldByCategoryConstant($c->id, $params['property']);
-				if(!$cf) throw new NotFoundException();
+				if(!$cf) throw new NotFoundException($params['property']);
 				foreach($db->selectAllDialogValueByCategoryField($cf->id) as $value) {
 					$values[] = ['id'=>$value->id, 'const'=>'', 'title'=>LANG($value->title)];
 				}
@@ -415,11 +419,11 @@ function handleJsonRequest($request) {
 		}
 
 	} catch(NotFoundException $e) {
-		$response['error'] = ['code'=> -32003, 'message'=>LANG('not_found'), 'data'=>null];
+		$response['error'] = ['code'=> -32003, 'message'=>LANG('not_found').' '.$e->getMessage(), 'data'=>null];
 	} catch(PermissionException $e) {
 		$response['error'] = ['code'=> -32002, 'message'=>LANG('permission_denied'), 'data'=>null];
 	} catch(InvalidRequestException $e) {
-		$response['error'] = ['code'=> -32001, 'message'=>$e->getMessage(), 'data'=>null];
+		$response['error'] = ['code'=> -32001, 'message'=>$e->getTraceAsString(), 'data'=>null];
 	} catch(Exception $e) {
 		$response['error'] = ['code'=> -32000, 'message'=>$e->getMessage(), 'data'=>null];
 	}
