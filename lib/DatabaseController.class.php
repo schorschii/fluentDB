@@ -145,6 +145,15 @@ class DatabaseController {
 		$this->stmt->execute();
 		return $this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\ObjTypeGroup');
 	}
+	public function selectObjectTypeGroup($id) {
+		$this->stmt = $this->dbh->prepare(
+			'SELECT * FROM `object_type_group` WHERE id = :id'
+		);
+		$this->stmt->execute([':id' => $id]);
+		foreach($this->stmt->fetchAll(PDO::FETCH_CLASS, 'Models\ObjTypeGroup') as $row) {
+			return $row;
+		}
+	}
 	public function selectAllObjectTypeByObjectTypeGroup($object_type_group_id) {
 		$this->stmt = $this->dbh->prepare(
 			'SELECT * FROM `object_type`'

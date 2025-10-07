@@ -2,12 +2,15 @@
 $SUBVIEW = 1;
 require_once('../../loader.inc.php');
 require_once('../session.inc.php');
+?>
 
+<?php
+if(!empty($_GET['id'])) {
 try {
-	$ot = $db->selectObjectType($_GET['id'] ?? -1);
+	$ot = $db->selectObjectType($_GET['id']);
 	if(!$ot) throw new NotFoundException();
-	$objects = $db->selectAllObjectByObjectType($_GET['id'] ?? -1);
-	$fields = $db->selectAllListViewFieldByObjectTypeSystemUser($_GET['id'] ?? -1, $currentSystemUser->id);
+	$objects = $db->selectAllObjectByObjectType($ot->id);
+	$fields = $db->selectAllListViewFieldByObjectTypeSystemUser($ot->id, $currentSystemUser->id);
 
 	// TODO
 	$permissionCreate = true;
@@ -84,3 +87,31 @@ try {
 		</table>
 	</div>
 </div>
+
+<?php } elseif(!empty($_GET['group_id'])) {
+try {
+	$otg = $db->selectObjectTypeGroup($_GET['group_id']);
+	if(!$otg) throw new NotFoundException();
+} catch(NotFoundException $e) {
+	die("<div class='alert warning'>".LANG('not_found')."</div>");
+} catch(PermissionException $e) {
+	die("<div class='alert warning'>".LANG('permission_denied')."</div>");
+} catch(InvalidRequestException $e) {
+	die("<div class='alert error'>".$e->getMessage()."</div>");
+}
+?>
+
+<h1>
+	<img src='img/folder.dyn.svg'><span id='page-title'><?php echo htmlspecialchars(LANG($otg->title)); ?></span>
+</h1>
+
+<div class='controls subfolders'>
+<?php foreach($db->selectAllObjectTypeByObjectTypeGroup($_GET['group_id']) as $ot) { ?>
+	<a class='box' <?php echo Html::explorerLink('views/objects.php?id='.$ot->id); ?>>
+		<?php if($ot->image) { ?><img src='<?php echo base64image($ot->image); ?>'><?php } ?>
+		<?php echo htmlspecialchars(LANG($ot->title)); ?>
+	</a>
+<?php } ?>
+</div>
+
+<?php } ?>
