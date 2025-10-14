@@ -150,8 +150,8 @@ function handleJsonRequest($request) {
 					$objectTypes[] = [
 						'id' => strval($ot->id),
 						'title' => LANG($ot->title),
-						'const' => $ot->id,
-						'container' => $ot->container,
+						'const' => strval($ot->id),
+						'container' => intval($ot->container),
 						'color' => '000000',
 						'image' => base64_encode($ot->image),
 						'icon' => '',
@@ -203,8 +203,8 @@ function handleJsonRequest($request) {
 					}
 				$response['result'] = [
 					'id' => $object->id,
-					'title' => $title,
-					'sysid' => $sysid,
+					'title' => $title ?? '',
+					'sysid' => $sysid ?? '',
 					'objecttype' => $object->object_type_id,
 					'type_title' => '',
 					'type_icon' => '',
@@ -371,7 +371,7 @@ function handleJsonRequest($request) {
 					if(!empty($params['filter']['title']) && $params['filter']['title'] != $object->title) continue;
 					$results[] = [
 						'id' => $object->id,
-						'title' => $object->title,
+						'title' => $object->title ?? '',
 						'sysid' => null,
 						'type' => null,
 						'created' => null,
