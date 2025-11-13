@@ -41,11 +41,11 @@ $permGeneral = $cl->checkPermission(null, PermissionManager::SPECIAL_PERMISSION_
 		<table class='list metadata'>
 			<tr>
 				<th><?php echo LANG('api_enabled'); ?>:</th>
-				<td><?php if($db->settings->get('client-api-enabled')) echo LANG('yes'); else echo LANG('no'); ?></td>
+				<td><?php if($db->settings->get('api-enabled')) echo LANG('yes'); else echo LANG('no'); ?></td>
 			</tr>
 			<tr>
 				<th><?php echo LANG('api_key'); ?>:</th>
-				<td><?php echo $permGeneral ? htmlspecialchars($db->settings->get('api-key')) : '<i>'.LANG('permission_denied').'</i>'; ?></td>
+				<td><?php echo $permGeneral ? '<span class="monospace">'.htmlspecialchars($db->settings->get('api-key')).'</span>' : '<i>'.LANG('permission_denied').'</i>'; ?></td>
 			</tr>
 		</table>
 	</div>
