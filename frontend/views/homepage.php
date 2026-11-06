@@ -56,8 +56,7 @@ $license = new LicenseCheck($db);
 				<div class='description'>
 					<h3>itDelivery - CMDB Übergabe-App</h3>
 					<div>
-						<div class='hint'>coming soon</div>
-						<a href='https://play.google.com/store/apps/details?id=systems.sieber.itdelivery' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
+						<a href='https://play.google.com/store/apps/details?id=systems.sieber.itdelivery_ng' target='_blank'><img src='img/playstore-badge.svg' style='max-height:50px'></a>
 					</div>
 				</div>
 			</div>
